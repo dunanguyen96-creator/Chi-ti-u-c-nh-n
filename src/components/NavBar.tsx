@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HomeIcon, ListIcon, ChartIcon, CardIcon } from "@/components/icons";
-import LiveClock from "@/components/LiveClock";
 
 const LINKS = [
   { href: "/", label: "Tổng quan", Icon: HomeIcon },
@@ -18,12 +17,9 @@ export default function NavBar() {
   return (
     <header className="border-b border-[var(--card-border)] sticky top-0 z-10 bg-[var(--background)]/90 backdrop-blur">
       <div className="mx-auto max-w-5xl px-4 py-2 sm:py-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6">
-        <div className="flex items-center justify-between gap-3">
-          <span className="font-semibold text-base sm:text-lg shrink-0 flex items-center gap-1.5">
-            <span aria-hidden>💰</span> Quản lý chi tiêu
-          </span>
-          <LiveClock className="sm:hidden" />
-        </div>
+        <span className="font-semibold text-base sm:text-lg shrink-0 flex items-center gap-1.5">
+          <span aria-hidden>💰</span> Quản lý chi tiêu
+        </span>
         <nav className="flex gap-1">
           {LINKS.map(({ href, label, Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -45,7 +41,6 @@ export default function NavBar() {
             );
           })}
         </nav>
-        <LiveClock className="hidden sm:inline-flex sm:ml-auto" />
       </div>
     </header>
   );

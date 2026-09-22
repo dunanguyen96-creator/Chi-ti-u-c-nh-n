@@ -1,6 +1,6 @@
 # Chi tiêu cá nhân
 
-Web app ghi chú chi tiêu và theo dõi báo cáo, thay thế cho Google Sheet theo dõi chi tiêu cá nhân. Mọi dữ liệu nhập vào đều **tự động lưu** vào database (SQLite) ngay khi bạn gõ — không cần bấm nút lưu riêng.
+Web app ghi chú chi tiêu và theo dõi báo cáo, thay thế cho Google Sheet theo dõi chi tiêu cá nhân. Mọi dữ liệu nhập vào đều **tự động lưu** vào database ngay khi bạn gõ — không cần bấm nút lưu riêng.
 
 ## Tính năng
 
@@ -11,22 +11,47 @@ Web app ghi chú chi tiêu và theo dõi báo cáo, thay thế cho Google Sheet 
 
 Danh mục chi tiêu (Thiết yếu, Cà phê/ăn vặt, Cá nhân, Sức khỏe, Biếu/Hiếu/hỉ, Giải trí, Học, Trả nợ/đáo thẻ, Mèo, Son, Khác) được lấy đúng theo bảng chi tiêu gốc.
 
-## Bắt đầu
+## Chạy ở máy cá nhân
+
+Cần một database PostgreSQL (có thể chạy Postgres cục bộ, hoặc lấy connection string miễn phí từ [Neon](https://neon.tech) / [Vercel Postgres](https://vercel.com/storage/postgres) — dùng chung với database production luôn cho tiện).
 
 ```bash
 npm install
-npx prisma migrate deploy   # tạo database SQLite theo schema
+cp .env.example .env   # rồi điền DATABASE_URL của bạn vào
+npx prisma migrate deploy
 npm run dev
 ```
 
 Mở [http://localhost:3000](http://localhost:3000).
 
-Dữ liệu được lưu trong file SQLite `prisma/dev.db` (đường dẫn cấu hình qua biến `DATABASE_URL` trong `.env`, xem mẫu ở `.env.example`).
+## Deploy lên Vercel (miễn phí)
+
+### 1. Tạo database Postgres miễn phí
+
+- Vào [vercel.com](https://vercel.com) → tạo project (xem bước 2) → tab **Storage** → **Create Database** → chọn **Postgres** (Neon) → tạo ở region gần Việt Nam (Singapore).
+- Vercel sẽ tự thêm biến môi trường `DATABASE_URL` (và vài biến khác) vào project — không cần copy tay.
+- (Nếu muốn tạo trước bằng tay: đăng ký free tại [neon.tech](https://neon.tech), tạo project, copy connection string dạng `postgresql://...?sslmode=require` để dán vào bước 3.)
+
+### 2. Import repo vào Vercel
+
+- Đăng nhập [vercel.com](https://vercel.com) bằng GitHub.
+- **Add New → Project** → chọn repo `dunanguyen96-creator/Chi-ti-u-c-nh-n`, nhánh `claude/kind-fermi-7v1n8q` (hoặc nhánh `main` sau khi merge).
+- Vercel tự nhận đây là app Next.js, không cần đổi cấu hình build.
+
+### 3. Kiểm tra biến môi trường
+
+- Vào **Settings → Environment Variables**, đảm bảo có `DATABASE_URL` trỏ đúng tới database ở bước 1.
+
+### 4. Deploy
+
+- Bấm **Deploy**. Build sẽ tự chạy `prisma generate` + `prisma migrate deploy` (tạo bảng trong database) rồi mới build app (đã cấu hình sẵn trong `package.json`).
+- Sau khi xong, Vercel cho một link dạng `https://ten-project.vercel.app` — mở là dùng được, dữ liệu nhập vào sẽ lưu thẳng vào Postgres, truy cập từ điện thoại/máy tính nào cũng thấy chung dữ liệu.
+- Mỗi lần push code lên nhánh đã kết nối, Vercel tự động deploy lại.
 
 ## Công nghệ
 
 - Next.js (App Router) + TypeScript + Tailwind CSS
-- Prisma ORM + SQLite — không cần cấu hình dịch vụ ngoài
+- Prisma ORM + PostgreSQL
 - API routes (`src/app/api/*`) xử lý lưu/sửa/xoá; các component client tự động gọi API sau khi người dùng nhập liệu (debounce ~600ms) để auto-save.
 
 ## Cấu trúc dữ liệu

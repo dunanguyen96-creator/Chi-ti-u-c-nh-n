@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import CreditCardCard from "@/components/CreditCardCard";
 import InstallmentManager from "@/components/InstallmentManager";
+import LoanManager from "@/components/LoanManager";
 import { monthKeyFromDate, formatMonthLabel } from "@/lib/constants";
-import type { CreditCard, Transaction, CardBaseline, Installment } from "@/lib/types";
+import type { CreditCard, Transaction, CardBaseline, Installment, Loan } from "@/lib/types";
 
 export default function TheTinDungPage() {
   const [month, setMonth] = useState(() => monthKeyFromDate(new Date()));
@@ -12,20 +13,23 @@ export default function TheTinDungPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [baselines, setBaselines] = useState<CardBaseline[]>([]);
   const [installments, setInstallments] = useState<Installment[]>([]);
+  const [loans, setLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (m: string) => {
     setLoading(true);
-    const [cardsRes, txRes, baselineRes, installmentRes] = await Promise.all([
+    const [cardsRes, txRes, baselineRes, installmentRes, loanRes] = await Promise.all([
       fetch("/api/cards"),
       fetch(`/api/transactions?month=${m}`),
       fetch(`/api/card-baselines?month=${m}`),
       fetch("/api/installments"),
+      fetch("/api/loans"),
     ]);
     setCards((await cardsRes.json()) as CreditCard[]);
     setTransactions((await txRes.json()) as Transaction[]);
     setBaselines((await baselineRes.json()) as CardBaseline[]);
     setInstallments((await installmentRes.json()) as Installment[]);
+    setLoans((await loanRes.json()) as Loan[]);
     setLoading(false);
   }, []);
 
@@ -70,6 +74,14 @@ export default function TheTinDungPage() {
     setInstallments((prev) => prev.filter((i) => i.id !== id));
   }
 
+  function handleLoanCreated(loan: Loan) {
+    setLoans((prev) => [loan, ...prev]);
+  }
+
+  function handleLoanDeleted(id: string) {
+    setLoans((prev) => prev.filter((l) => l.id !== id));
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 flex flex-col gap-6 w-full">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -108,6 +120,8 @@ export default function TheTinDungPage() {
             onCreated={handleInstallmentCreated}
             onDeleted={handleInstallmentDeleted}
           />
+
+          <LoanManager loans={loans} onCreated={handleLoanCreated} onDeleted={handleLoanDeleted} />
         </>
       )}
     </div>

@@ -48,6 +48,16 @@ export interface Installment {
   monthlyAmount: number;
 }
 
+export interface Loan {
+  id: string;
+  description: string;
+  loanDate: string;
+  termMonths: number;
+  interestRate: number;
+  monthlyInterest: number;
+  monthlyPrincipal: number;
+}
+
 export interface CardStatement {
   id: string;
   cardId: string;

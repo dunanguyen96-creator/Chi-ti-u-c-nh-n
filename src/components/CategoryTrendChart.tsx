@@ -165,7 +165,6 @@ export default function CategoryTrendChart({
                 strokeWidth={2}
                 strokeLinejoin="round"
                 strokeLinecap="round"
-                strokeDasharray={style.dashed ? "5 3" : undefined}
               />
               {hoverIdx !== null && (
                 <circle
@@ -219,13 +218,7 @@ export default function CategoryTrendChart({
               />
               <span
                 className="w-3 h-0.5 shrink-0"
-                style={{
-                  backgroundColor: style.color,
-                  opacity: checked ? 1 : 0.35,
-                  backgroundImage: style.dashed
-                    ? "repeating-linear-gradient(90deg, currentColor 0 3px, transparent 3px 5px)"
-                    : undefined,
-                }}
+                style={{ backgroundColor: style.color, opacity: checked ? 1 : 0.35 }}
               />
               <span className={checked ? "text-foreground/80" : "text-foreground/40"}>
                 {category}

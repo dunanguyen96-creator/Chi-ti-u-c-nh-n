@@ -86,12 +86,16 @@ model Installment {
 }
 
 model CreditCard {
-  id         String          @id @default(cuid())
-  name       String          @unique
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-  statements CardStatement[]
-  payments   CardPayment[]
+  id          String          @id @default(cuid())
+  name        String          @unique
+  // Set only for overdraft-style accounts (e.g. "Mycash thấu chi") that have
+  // no statement cycle: when present, the card shows Hạn mức/Dư nợ/Khả dụng
+  // instead of Sao kê, and payments subtract straight from Dư nợ.
+  creditLimit Int?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  statements  CardStatement[]
+  payments    CardPayment[]
 }
 
 model CardStatement {

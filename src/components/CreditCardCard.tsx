@@ -90,6 +90,13 @@ export default function CreditCardCard({
   const [deleting, setDeleting] = useState(false);
   const theme = cardTheme(card.name);
 
+  // Overdraft-style account (e.g. "Mycash thấu chi"): no statement cycle —
+  // show Hạn mức/Dư nợ/Khả dụng instead, with Dư nợ reduced by payments.
+  const isOverdraft = card.creditLimit != null;
+  const totalPayments = card.payments.reduce((sum, p) => sum + p.amount, 0);
+  const debt = expectedBalance - totalPayments;
+  const available = (card.creditLimit ?? 0) - debt;
+
   const { status, trigger } = useDebouncedSave(async (value: string) => {
     const res = await fetch(`/api/cards/${card.id}`, {
       method: "PATCH",
@@ -221,69 +228,88 @@ export default function CreditCardCard({
       </div>
 
       <div className="p-4 flex flex-col gap-3">
-        {monthTotal > 0 && (
-          <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
-            <span className="text-sm text-foreground/60">Chi tiêu tháng này</span>
-            <span className="font-semibold text-rose-600">{formatVnd(monthTotal)}</span>
-          </div>
-        )}
-
-        <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
-          <span className="text-sm text-foreground/60">Dư nợ dự kiến</span>
-          <span className="font-bold">{formatVnd(expectedBalance)}</span>
-        </div>
-
-        <details className="text-sm" open>
-          <summary className="cursor-pointer font-medium text-foreground/80">
-            Sao kê ({card.statements.length})
-          </summary>
-          <div className="mt-2 flex flex-col gap-2">
-            {card.statements.length > 0 && (
-              <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
-                {card.statements.map((s) => (
-                  <StatementRow
-                    key={s.id}
-                    cardId={card.id}
-                    statement={s}
-                    remaining={remainingFor(s, card.payments)}
-                    onDeleted={handleStatementDeleted}
-                  />
-                ))}
-              </ul>
+        {isOverdraft ? (
+          <>
+            <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
+              <span className="text-sm text-foreground/60">Hạn mức</span>
+              <span className="font-semibold">{formatVnd(card.creditLimit!)}</span>
+            </div>
+            <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
+              <span className="text-sm text-foreground/60">Dư nợ</span>
+              <span className="font-bold text-rose-600">{formatVnd(debt)}</span>
+            </div>
+            <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
+              <span className="text-sm text-foreground/60">Khả dụng</span>
+              <span className="font-semibold text-emerald-600">{formatVnd(available)}</span>
+            </div>
+          </>
+        ) : (
+          <>
+            {monthTotal > 0 && (
+              <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
+                <span className="text-sm text-foreground/60">Chi tiêu tháng này</span>
+                <span className="font-semibold text-rose-600">{formatVnd(monthTotal)}</span>
+              </div>
             )}
-            <form onSubmit={addStatement} className="flex items-center gap-2 flex-wrap">
-              <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
-                Kỳ sao kê
-                <input
-                  type="date"
-                  value={stDate}
-                  onChange={(e) => setStDate(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-              <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
-                Số tiền
-                <MoneyInput value={stBalance} onChange={setStBalance} className={`${inputClass} w-32`} />
-              </label>
-              <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
-                Hạn thanh toán
-                <input
-                  type="date"
-                  value={stDueDate}
-                  onChange={(e) => setStDueDate(e.target.value)}
-                  className={inputClass}
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={stSubmitting || !stBalance}
-                className="rounded-lg bg-[var(--accent)] text-white px-3 py-1.5 text-xs font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50 self-end"
-              >
-                + Thêm sao kê
-              </button>
-            </form>
-          </div>
-        </details>
+
+            <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
+              <span className="text-sm text-foreground/60">Dư nợ dự kiến</span>
+              <span className="font-bold">{formatVnd(expectedBalance)}</span>
+            </div>
+
+            <details className="text-sm" open>
+              <summary className="cursor-pointer font-medium text-foreground/80">
+                Sao kê ({card.statements.length})
+              </summary>
+              <div className="mt-2 flex flex-col gap-2">
+                {card.statements.length > 0 && (
+                  <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
+                    {card.statements.map((s) => (
+                      <StatementRow
+                        key={s.id}
+                        cardId={card.id}
+                        statement={s}
+                        remaining={remainingFor(s, card.payments)}
+                        onDeleted={handleStatementDeleted}
+                      />
+                    ))}
+                  </ul>
+                )}
+                <form onSubmit={addStatement} className="flex items-center gap-2 flex-wrap">
+                  <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
+                    Kỳ sao kê
+                    <input
+                      type="date"
+                      value={stDate}
+                      onChange={(e) => setStDate(e.target.value)}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
+                    Số tiền
+                    <MoneyInput value={stBalance} onChange={setStBalance} className={`${inputClass} w-32`} />
+                  </label>
+                  <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
+                    Hạn thanh toán
+                    <input
+                      type="date"
+                      value={stDueDate}
+                      onChange={(e) => setStDueDate(e.target.value)}
+                      className={inputClass}
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={stSubmitting || !stBalance}
+                    className="rounded-lg bg-[var(--accent)] text-white px-3 py-1.5 text-xs font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50 self-end"
+                  >
+                    + Thêm sao kê
+                  </button>
+                </form>
+              </div>
+            </details>
+          </>
+        )}
 
         <details className="text-sm">
           <summary className="cursor-pointer font-medium text-foreground/80">

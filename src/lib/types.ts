@@ -67,6 +67,7 @@ export interface CardPayment {
 export interface CreditCard {
   id: string;
   name: string;
+  creditLimit: number | null;
   statements: CardStatement[];
   payments: CardPayment[];
 }

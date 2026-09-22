@@ -29,6 +29,12 @@ export function formatMonthLabel(monthKey: string): string {
   return `${month}/${year.slice(2)}`;
 }
 
+export function shiftMonth(monthKey: string, delta: number): string {
+  const [year, month] = monthKey.split("-").map(Number);
+  const d = new Date(year, month - 1 + delta, 1);
+  return monthKeyFromDate(d);
+}
+
 export function formatVnd(amount: number): string {
   return new Intl.NumberFormat("vi-VN").format(Math.round(amount)) + " đ";
 }

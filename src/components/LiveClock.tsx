@@ -12,7 +12,7 @@ function formatNow(d: Date) {
   return `${date} ${time}`;
 }
 
-export default function LiveClock() {
+export default function LiveClock({ className = "" }: { className?: string }) {
   // Start null so the server-rendered markup has no clock text — the real
   // time is only known once this runs on the client — and fill it in via
   // effect to avoid a hydration mismatch against the server's render time.
@@ -28,7 +28,7 @@ export default function LiveClock() {
   if (!now) return null;
 
   return (
-    <span className="ml-auto text-sm text-foreground/60 tabular-nums shrink-0">
+    <span className={`text-xs sm:text-sm text-foreground/60 tabular-nums shrink-0 ${className}`}>
       {formatNow(now)}
     </span>
   );

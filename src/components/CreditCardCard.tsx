@@ -226,15 +226,16 @@ export default function CreditCardCard({
           </div>
         )}
 
+        <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
+          <span className="text-sm text-foreground/60">Dư nợ dự kiến</span>
+          <span className="font-bold">{formatVnd(monthTotal)}</span>
+        </div>
+
         <details className="text-sm" open>
           <summary className="cursor-pointer font-medium text-foreground/80">
             Sao kê ({card.statements.length})
           </summary>
           <div className="mt-2 flex flex-col gap-2">
-            <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
-              <span className="text-sm text-foreground/60">Dư nợ dự kiến</span>
-              <span className="font-bold">{formatVnd(monthTotal)}</span>
-            </div>
             {card.statements.length > 0 && (
               <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
                 {card.statements.map((s) => (

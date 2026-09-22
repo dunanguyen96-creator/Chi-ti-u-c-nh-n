@@ -20,23 +20,21 @@ export default function NavBar() {
         <span className="font-semibold text-base sm:text-lg shrink-0 flex items-center gap-1.5">
           <span aria-hidden>💰</span> Quản lý chi tiêu
         </span>
-        <nav className="flex gap-1">
+        <nav className="flex gap-1 overflow-x-auto -mx-1 px-1 sm:mx-0 sm:px-0">
           {LINKS.map(({ href, label, Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link
                 key={href}
                 href={href}
-                title={label}
-                aria-label={label}
-                className={`p-2 sm:px-3 sm:py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+                className={`px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 sm:gap-1.5 shrink-0 whitespace-nowrap ${
                   active
                     ? "bg-[var(--accent)] text-white"
                     : "text-foreground/70 hover:bg-[var(--accent-soft)] hover:text-[var(--accent-soft-fg)]"
                 }`}
               >
                 <Icon />
-                <span className="hidden sm:inline">{label}</span>
+                {label}
               </Link>
             );
           })}

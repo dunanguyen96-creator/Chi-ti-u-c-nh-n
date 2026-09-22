@@ -38,6 +38,8 @@ export interface CreditCard {
   cardLimit: number | null;
   installmentAmount: number | null;
   installmentTerm: string | null;
+  statementClosingDay: number | null;
+  paymentDueDay: number | null;
   statements: CardStatement[];
   payments: CardPayment[];
 }

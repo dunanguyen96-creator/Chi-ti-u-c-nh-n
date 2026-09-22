@@ -18,6 +18,16 @@ export async function PATCH(
     data.installmentAmount =
       body.installmentAmount === null || body.installmentAmount === "" ? null : Number(body.installmentAmount);
   }
+  if (body.statementClosingDay !== undefined) {
+    data.statementClosingDay =
+      body.statementClosingDay === null || body.statementClosingDay === ""
+        ? null
+        : Number(body.statementClosingDay);
+  }
+  if (body.paymentDueDay !== undefined) {
+    data.paymentDueDay =
+      body.paymentDueDay === null || body.paymentDueDay === "" ? null : Number(body.paymentDueDay);
+  }
 
   const card = await prisma.creditCard.update({
     where: { id },

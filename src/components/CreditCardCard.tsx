@@ -30,6 +30,12 @@ export default function CreditCardCard({
     card.installmentAmount != null ? String(card.installmentAmount) : "",
   );
   const [installmentTerm, setInstallmentTerm] = useState(card.installmentTerm ?? "");
+  const [statementClosingDay, setStatementClosingDay] = useState(
+    card.statementClosingDay != null ? String(card.statementClosingDay) : "",
+  );
+  const [paymentDueDay, setPaymentDueDay] = useState(
+    card.paymentDueDay != null ? String(card.paymentDueDay) : "",
+  );
   const [deleting, setDeleting] = useState(false);
 
   const { status, trigger } = useDebouncedSave(async (patch: Record<string, unknown>) => {
@@ -166,6 +172,30 @@ export default function CreditCardCard({
             placeholder="VD: 24 tháng"
             value={installmentTerm}
             onChange={(e) => field(setInstallmentTerm, "installmentTerm")(e.target.value)}
+            className={inputClass}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs text-foreground/60">
+          Ngày chốt sao kê (hàng tháng)
+          <input
+            type="number"
+            min={1}
+            max={31}
+            placeholder="VD: 22"
+            value={statementClosingDay}
+            onChange={(e) => field(setStatementClosingDay, "statementClosingDay")(e.target.value)}
+            className={inputClass}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs text-foreground/60">
+          Ngày thanh toán (hàng tháng)
+          <input
+            type="number"
+            min={1}
+            max={31}
+            placeholder="VD: 5"
+            value={paymentDueDay}
+            onChange={(e) => field(setPaymentDueDay, "paymentDueDay")(e.target.value)}
             className={inputClass}
           />
         </label>

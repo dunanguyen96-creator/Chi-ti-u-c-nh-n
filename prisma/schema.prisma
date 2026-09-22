@@ -40,15 +40,17 @@ model Income {
 }
 
 model CreditCard {
-  id                String          @id @default(cuid())
-  name              String          @unique
-  cardLimit         Int?
-  installmentAmount Int?
-  installmentTerm   String?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  statements        CardStatement[]
-  payments          CardPayment[]
+  id                   String          @id @default(cuid())
+  name                 String          @unique
+  cardLimit            Int?
+  installmentAmount    Int?
+  installmentTerm      String?
+  statementClosingDay  Int?
+  paymentDueDay        Int?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  statements           CardStatement[]
+  payments             CardPayment[]
 }
 
 model CardStatement {

@@ -101,7 +101,7 @@ function TransactionRow({
           onChange={(e) => field(setCard, "card")(e.target.value)}
           className={inputClass}
         >
-          <option value="">none</option>
+          <option value="">Cash</option>
           {CARDS.map((c) => (
             <option key={c} value={c}>
               {c}

@@ -203,7 +203,7 @@ export default function TransactionForm({
             onChange={(e) => update("card", e.target.value)}
             className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
           >
-            <option value="">— none (tiền mặt) —</option>
+            <option value="">Cash</option>
             {CARDS.map((c) => (
               <option key={c} value={c}>
                 {c}

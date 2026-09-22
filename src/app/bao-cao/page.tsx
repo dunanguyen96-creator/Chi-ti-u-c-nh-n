@@ -1,121 +1,94 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CATEGORIES, monthKeyFromDate, formatMonthLabel, formatVnd } from "@/lib/constants";
 import type { Transaction, Income } from "@/lib/types";
 
 export default function BaoCaoPage() {
+  const [month, setMonth] = useState(() => monthKeyFromDate(new Date()));
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const [txRes, incomeRes] = await Promise.all([
-        fetch("/api/transactions"),
-        fetch("/api/income"),
-      ]);
-      setTransactions((await txRes.json()) as Transaction[]);
-      setIncomes((await incomeRes.json()) as Income[]);
-      setLoading(false);
-    }
-    load();
+  const load = useCallback(async (m: string) => {
+    setLoading(true);
+    const [txRes, incomeRes] = await Promise.all([
+      fetch(`/api/transactions?month=${m}`),
+      fetch(`/api/income?month=${m}`),
+    ]);
+    setTransactions((await txRes.json()) as Transaction[]);
+    setIncomes((await incomeRes.json()) as Income[]);
+    setLoading(false);
   }, []);
 
-  const months = new Set<string>();
-  transactions.forEach((t) => months.add(monthKeyFromDate(t.date)));
-  incomes.forEach((i) => months.add(i.month));
-  if (months.size === 0) months.add(monthKeyFromDate(new Date()));
-  const sortedMonths = [...months].sort();
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount/month change
+    load(month);
+  }, [month, load]);
 
-  const byCategoryMonth = new Map<string, Map<string, number>>();
-  for (const category of CATEGORIES) byCategoryMonth.set(category, new Map());
-  const totalByMonth = new Map<string, number>();
-
+  const totalsByCategory = new Map<string, number>();
+  for (const category of CATEGORIES) totalsByCategory.set(category, 0);
   for (const t of transactions) {
-    const m = monthKeyFromDate(t.date);
-    const catMap = byCategoryMonth.get(t.category) ?? new Map();
-    catMap.set(m, (catMap.get(m) ?? 0) + t.amount);
-    byCategoryMonth.set(t.category, catMap);
-    totalByMonth.set(m, (totalByMonth.get(m) ?? 0) + t.amount);
+    totalsByCategory.set(t.category, (totalsByCategory.get(t.category) ?? 0) + t.amount);
   }
 
-  const incomeByMonth = new Map(incomes.map((i) => [i.month, i.amount]));
+  const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
+  const balance = totalIncome - totalExpense;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 flex flex-col gap-6 w-full">
-      <h1 className="text-xl font-semibold">Báo cáo theo tháng &amp; hạng mục</h1>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-xl font-semibold">Báo cáo</h1>
+        <label className="flex items-center gap-2 text-sm">
+          Tháng
+          <input
+            type="month"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+          />
+          <span className="text-foreground/60">({formatMonthLabel(month)})</span>
+        </label>
+      </div>
 
       {loading ? (
         <p className="text-sm text-foreground/50 py-6 text-center">Đang tải...</p>
       ) : (
-        <div className="rounded-lg border border-black/10 dark:border-white/10 overflow-x-auto">
-          <table className="w-full text-sm border-collapse min-w-[600px]">
+        <div className="rounded-lg border border-black/10 dark:border-white/10 overflow-hidden">
+          <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="text-left text-foreground/60 border-b border-black/10 dark:border-white/10">
-                <th className="p-2 font-medium sticky left-0 bg-[var(--background)]">
-                  Hạng mục
-                </th>
-                {sortedMonths.map((m) => (
-                  <th key={m} className="p-2 font-medium text-right whitespace-nowrap">
-                    {formatMonthLabel(m)}
-                  </th>
-                ))}
+                <th className="p-2 font-medium">Hạng mục</th>
+                <th className="p-2 font-medium text-right">Số tiền</th>
               </tr>
             </thead>
             <tbody>
-              {CATEGORIES.map((category) => {
-                const catMap = byCategoryMonth.get(category)!;
-                const rowTotal = [...catMap.values()].reduce((a, b) => a + b, 0);
-                if (rowTotal === 0) return null;
-                return (
-                  <tr
-                    key={category}
-                    className="border-b border-black/5 dark:border-white/10"
-                  >
-                    <td className="p-2 sticky left-0 bg-[var(--background)]">
-                      {category}
-                    </td>
-                    {sortedMonths.map((m) => (
-                      <td key={m} className="p-2 text-right tabular-nums">
-                        {catMap.get(m) ? formatVnd(catMap.get(m)!) : "–"}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-              <tr className="font-medium border-t border-black/10 dark:border-white/10">
-                <td className="p-2 sticky left-0 bg-[var(--background)]">TỔNG CHI</td>
-                {sortedMonths.map((m) => (
-                  <td key={m} className="p-2 text-right tabular-nums text-rose-600">
-                    {formatVnd(totalByMonth.get(m) ?? 0)}
+              {CATEGORIES.map((category) => (
+                <tr key={category} className="border-b border-black/5 dark:border-white/10">
+                  <td className="p-2">{category}</td>
+                  <td className="p-2 text-right tabular-nums">
+                    {totalsByCategory.get(category) ? formatVnd(totalsByCategory.get(category)!) : "–"}
                   </td>
-                ))}
+                </tr>
+              ))}
+              <tr className="font-medium border-t border-black/10 dark:border-white/10">
+                <td className="p-2">TỔNG CHI</td>
+                <td className="p-2 text-right tabular-nums text-rose-600">{formatVnd(totalExpense)}</td>
               </tr>
               <tr>
-                <td className="p-2 sticky left-0 bg-[var(--background)]">Thu nhập</td>
-                {sortedMonths.map((m) => (
-                  <td key={m} className="p-2 text-right tabular-nums text-emerald-600">
-                    {formatVnd(incomeByMonth.get(m) ?? 0)}
-                  </td>
-                ))}
+                <td className="p-2">Thu nhập</td>
+                <td className="p-2 text-right tabular-nums text-emerald-600">{formatVnd(totalIncome)}</td>
               </tr>
               <tr className="font-medium border-t border-black/10 dark:border-white/10">
-                <td className="p-2 sticky left-0 bg-[var(--background)]">Chênh lệch</td>
-                {sortedMonths.map((m) => {
-                  const diff = (incomeByMonth.get(m) ?? 0) - (totalByMonth.get(m) ?? 0);
-                  return (
-                    <td
-                      key={m}
-                      className={`p-2 text-right tabular-nums ${
-                        diff >= 0 ? "text-emerald-600" : "text-rose-600"
-                      }`}
-                    >
-                      {formatVnd(diff)}
-                    </td>
-                  );
-                })}
+                <td className="p-2">Chênh lệch</td>
+                <td
+                  className={`p-2 text-right tabular-nums ${
+                    balance >= 0 ? "text-emerald-600" : "text-rose-600"
+                  }`}
+                >
+                  {formatVnd(balance)}
+                </td>
               </tr>
             </tbody>
           </table>

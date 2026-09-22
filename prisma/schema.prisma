@@ -14,6 +14,7 @@ datasource db {
 model Transaction {
   id          String   @id @default(cuid())
   date        DateTime
+  recordMonth String
   description String
   category    String
   card        String?
@@ -24,6 +25,7 @@ model Transaction {
 
   @@index([date])
   @@index([category])
+  @@index([recordMonth])
 }
 
 model Income {
@@ -34,22 +36,39 @@ model Income {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([month])
+  @@index([month])
 }
 
-model DebtAccount {
-  id                  String   @id @default(cuid())
-  name                String
-  monthlyInterestRate Float?
-  yearlyInterestRate  Float?
-  serviceFee          String?
-  borrowedAmount      Int?
-  remainingAmount     Int?
-  availableLimit      Int?
-  note                String?
-  interestClosingDay  Int?
-  paymentDay          Int?
-  cashbackPolicy      String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+model CreditCard {
+  id                String          @id @default(cuid())
+  name              String          @unique
+  cardLimit         Int?
+  installmentAmount Int?
+  installmentTerm   String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  statements        CardStatement[]
+  payments          CardPayment[]
+}
+
+model CardStatement {
+  id        String     @id @default(cuid())
+  cardId    String
+  card      CreditCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  date      DateTime
+  balance   Int
+  createdAt DateTime   @default(now())
+
+  @@index([cardId])
+}
+
+model CardPayment {
+  id        String     @id @default(cuid())
+  cardId    String
+  card      CreditCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  date      DateTime
+  amount    Int
+  createdAt DateTime   @default(now())
+
+  @@index([cardId])
 }

@@ -1,6 +1,7 @@
 export interface Transaction {
   id: string;
   date: string;
+  recordMonth: string;
   description: string;
   category: string;
   card: string | null;
@@ -17,17 +18,26 @@ export interface Income {
   note: string | null;
 }
 
-export interface DebtAccount {
+export interface CardStatement {
+  id: string;
+  cardId: string;
+  date: string;
+  balance: number;
+}
+
+export interface CardPayment {
+  id: string;
+  cardId: string;
+  date: string;
+  amount: number;
+}
+
+export interface CreditCard {
   id: string;
   name: string;
-  monthlyInterestRate: number | null;
-  yearlyInterestRate: number | null;
-  serviceFee: string | null;
-  borrowedAmount: number | null;
-  remainingAmount: number | null;
-  availableLimit: number | null;
-  note: string | null;
-  interestClosingDay: number | null;
-  paymentDay: number | null;
-  cashbackPolicy: string | null;
+  cardLimit: number | null;
+  installmentAmount: number | null;
+  installmentTerm: string | null;
+  statements: CardStatement[];
+  payments: CardPayment[];
 }

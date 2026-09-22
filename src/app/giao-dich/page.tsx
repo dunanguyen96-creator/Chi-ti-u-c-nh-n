@@ -25,7 +25,7 @@ export default function GiaoDichPage() {
   }, [month, load]);
 
   function handleAdded(t: Transaction) {
-    if (monthKeyFromDate(t.date) === month) {
+    if (t.recordMonth === month) {
       setTransactions((prev) =>
         [t, ...prev].sort((a, b) => (a.date < b.date ? 1 : -1)),
       );

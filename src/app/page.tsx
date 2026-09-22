@@ -2,27 +2,25 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import IncomeInput from "@/components/IncomeInput";
+import IncomeList from "@/components/IncomeList";
 import CategoryBreakdown from "@/components/CategoryBreakdown";
 import { monthKeyFromDate, formatMonthLabel, formatVnd } from "@/lib/constants";
-import type { Transaction } from "@/lib/types";
+import type { Transaction, Income } from "@/lib/types";
 
 export default function DashboardPage() {
   const [month, setMonth] = useState(() => monthKeyFromDate(new Date()));
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [income, setIncome] = useState(0);
+  const [incomes, setIncomes] = useState<Income[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (m: string) => {
     setLoading(true);
     const [txRes, incomeRes] = await Promise.all([
       fetch(`/api/transactions?month=${m}`),
-      fetch(`/api/income`),
+      fetch(`/api/income?month=${m}`),
     ]);
-    const tx = (await txRes.json()) as Transaction[];
-    const incomes = (await incomeRes.json()) as { month: string; amount: number }[];
-    setTransactions(tx);
-    setIncome(incomes.find((i) => i.month === m)?.amount ?? 0);
+    setTransactions((await txRes.json()) as Transaction[]);
+    setIncomes((await incomeRes.json()) as Income[]);
     setLoading(false);
   }, []);
 
@@ -32,7 +30,8 @@ export default function DashboardPage() {
   }, [month, load]);
 
   const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0);
-  const balance = income - totalExpense;
+  const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
+  const balance = totalIncome - totalExpense;
   const recent = transactions.slice(0, 6);
 
   return (
@@ -52,9 +51,14 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-lg border border-black/10 dark:border-white/10 p-4 flex flex-col gap-2">
+        <div className="rounded-lg border border-black/10 dark:border-white/10 p-4 flex flex-col gap-2 sm:col-span-1">
           <span className="text-sm text-foreground/60">Thu nhập</span>
-          <IncomeInput month={month} initialAmount={income} onSaved={setIncome} />
+          <IncomeList
+            month={month}
+            incomes={incomes}
+            onAdded={(i) => setIncomes((prev) => [i, ...prev])}
+            onDeleted={(id) => setIncomes((prev) => prev.filter((i) => i.id !== id))}
+          />
         </div>
         <div className="rounded-lg border border-black/10 dark:border-white/10 p-4 flex flex-col gap-1">
           <span className="text-sm text-foreground/60">Tổng chi</span>

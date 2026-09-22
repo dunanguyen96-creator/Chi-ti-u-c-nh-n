@@ -7,7 +7,7 @@ const LINKS = [
   { href: "/", label: "Tổng quan" },
   { href: "/giao-dich", label: "Giao dịch" },
   { href: "/bao-cao", label: "Báo cáo" },
-  { href: "/no-the", label: "Nợ / Thẻ" },
+  { href: "/the-tin-dung", label: "Thẻ tín dụng" },
 ];
 
 export default function NavBar() {

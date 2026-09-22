@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CATEGORIES, CARDS, formatVnd } from "@/lib/constants";
 import { useDebouncedSave } from "@/lib/useDebouncedSave";
 import SaveStatusBadge from "@/components/SaveStatusBadge";
+import MoneyInput from "@/components/MoneyInput";
 import type { Transaction } from "@/lib/types";
 
 function TransactionRow({
@@ -14,6 +15,7 @@ function TransactionRow({
   onDeleted: (id: string) => void;
 }) {
   const [date, setDate] = useState(transaction.date.slice(0, 10));
+  const [recordMonth, setRecordMonth] = useState(transaction.recordMonth);
   const [description, setDescription] = useState(transaction.description);
   const [category, setCategory] = useState(transaction.category);
   const [card, setCard] = useState(transaction.card ?? "");
@@ -63,6 +65,15 @@ function TransactionRow({
           className={inputClass}
         />
       </td>
+      <td className="p-1">
+        <input
+          type="month"
+          value={recordMonth}
+          onChange={(e) => field(setRecordMonth, "recordMonth")(e.target.value)}
+          title="Tháng tính vào báo cáo/thẻ"
+          className={inputClass}
+        />
+      </td>
       <td className="p-1 min-w-[140px]">
         <input
           type="text"
@@ -90,7 +101,7 @@ function TransactionRow({
           onChange={(e) => field(setCard, "card")(e.target.value)}
           className={inputClass}
         >
-          <option value="">— Tiền mặt —</option>
+          <option value="">none</option>
           {CARDS.map((c) => (
             <option key={c} value={c}>
               {c}
@@ -99,10 +110,9 @@ function TransactionRow({
         </select>
       </td>
       <td className="p-1 text-right">
-        <input
-          type="number"
+        <MoneyInput
           value={amount}
-          onChange={(e) => field(setAmount, "amount")(e.target.value)}
+          onChange={field(setAmount, "amount")}
           className={`${inputClass} text-right`}
         />
       </td>
@@ -154,6 +164,7 @@ export default function TransactionTable({
         <thead>
           <tr className="text-left text-foreground/60 border-b border-black/10 dark:border-white/10">
             <th className="p-1 font-medium">Ngày</th>
+            <th className="p-1 font-medium">Tháng ghi nhận</th>
             <th className="p-1 font-medium">Chi tiêu</th>
             <th className="p-1 font-medium">Hạng mục</th>
             <th className="p-1 font-medium">Thẻ</th>
@@ -169,7 +180,7 @@ export default function TransactionTable({
         </tbody>
         <tfoot>
           <tr className="font-medium border-t border-black/10 dark:border-white/10">
-            <td className="p-1.5" colSpan={4}>
+            <td className="p-1.5" colSpan={5}>
               Tổng ({transactions.length} giao dịch)
             </td>
             <td className="p-1.5 text-right">{formatVnd(total)}</td>

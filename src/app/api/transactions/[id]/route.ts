@@ -10,6 +10,7 @@ export async function PATCH(
   const data: Record<string, unknown> = {};
 
   if (body.date !== undefined) data.date = new Date(body.date);
+  if (body.recordMonth !== undefined) data.recordMonth = body.recordMonth;
   if (body.description !== undefined) data.description = body.description;
   if (body.category !== undefined) data.category = body.category;
   if (body.card !== undefined) data.card = body.card || null;

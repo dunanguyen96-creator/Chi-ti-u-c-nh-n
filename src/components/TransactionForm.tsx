@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CATEGORIES, CARDS } from "@/lib/constants";
+import { useEffect, useRef, useState } from "react";
+import { CATEGORIES, CARDS, monthKeyFromDate } from "@/lib/constants";
+import MoneyInput from "@/components/MoneyInput";
 import type { Transaction } from "@/lib/types";
 
 const DRAFT_KEY = "chi-tieu:draft-transaction";
@@ -12,6 +13,7 @@ function todayStr() {
 
 interface Draft {
   date: string;
+  recordMonth: string;
   description: string;
   category: string;
   card: string;
@@ -20,8 +22,10 @@ interface Draft {
 }
 
 function emptyDraft(): Draft {
+  const date = todayStr();
   return {
-    date: todayStr(),
+    date,
+    recordMonth: monthKeyFromDate(date),
     description: "",
     category: CATEGORIES[0],
     card: "",
@@ -39,6 +43,7 @@ export default function TransactionForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [restored, setRestored] = useState(false);
+  const recordMonthManual = useRef(false);
 
   // Restore any unsaved draft so nothing typed is lost on navigation/reload.
   useEffect(() => {
@@ -48,6 +53,7 @@ export default function TransactionForm({
         const parsed = JSON.parse(raw) as Partial<Draft>;
         // eslint-disable-next-line react-hooks/set-state-in-effect -- restore locally saved draft on mount
         setDraft((d) => ({ ...d, ...parsed }));
+        if (parsed.recordMonth) recordMonthManual.current = true;
         if (parsed.description || parsed.amount) setRestored(true);
       }
     } catch {
@@ -69,6 +75,20 @@ export default function TransactionForm({
     setDraft((d) => ({ ...d, [key]: value }));
   }
 
+  function updateDate(value: string) {
+    setError(null);
+    setDraft((d) => ({
+      ...d,
+      date: value,
+      recordMonth: recordMonthManual.current ? d.recordMonth : monthKeyFromDate(value),
+    }));
+  }
+
+  function updateRecordMonth(value: string) {
+    recordMonthManual.current = true;
+    update("recordMonth", value);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!draft.description.trim() || !draft.amount) {
@@ -83,6 +103,7 @@ export default function TransactionForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: draft.date,
+          recordMonth: draft.recordMonth,
           description: draft.description.trim(),
           category: draft.category,
           card: draft.card || null,
@@ -96,6 +117,7 @@ export default function TransactionForm({
       const next = emptyDraft();
       next.category = draft.category;
       next.card = draft.card;
+      recordMonthManual.current = false;
       setDraft(next);
       setRestored(false);
       localStorage.removeItem(DRAFT_KEY);
@@ -126,7 +148,18 @@ export default function TransactionForm({
             type="date"
             required
             value={draft.date}
-            onChange={(e) => update("date", e.target.value)}
+            onChange={(e) => updateDate(e.target.value)}
+            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Tháng ghi nhận
+          <input
+            type="month"
+            required
+            value={draft.recordMonth}
+            onChange={(e) => updateRecordMonth(e.target.value)}
+            title="Tháng tính vào báo cáo/thẻ (VD chi tháng 9 nhưng ghi nhận tháng 10)"
             className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
           />
         </label>
@@ -143,13 +176,9 @@ export default function TransactionForm({
         </label>
         <label className="flex flex-col gap-1 text-sm">
           Số tiền (đ)
-          <input
-            type="number"
-            required
-            min={0}
-            placeholder="0"
+          <MoneyInput
             value={draft.amount}
-            onChange={(e) => update("amount", e.target.value)}
+            onChange={(v) => update("amount", v)}
             className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
           />
         </label>
@@ -174,7 +203,7 @@ export default function TransactionForm({
             onChange={(e) => update("card", e.target.value)}
             className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
           >
-            <option value="">— Tiền mặt —</option>
+            <option value="">— none (tiền mặt) —</option>
             {CARDS.map((c) => (
               <option key={c} value={c}>
                 {c}

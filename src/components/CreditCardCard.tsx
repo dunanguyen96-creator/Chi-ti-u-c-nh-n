@@ -250,7 +250,7 @@ export default function CreditCardCard({
 
       <details className="text-sm">
         <summary className="cursor-pointer font-medium text-foreground/80">
-          Lịch thanh toán ({card.payments.length})
+          Lịch sử thanh toán ({card.payments.length})
         </summary>
         <div className="mt-2 flex flex-col gap-2">
           {card.payments.length > 0 && (
@@ -284,7 +284,7 @@ export default function CreditCardCard({
               disabled={pSubmitting || !pAmount}
               className="rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-emerald-700 disabled:opacity-50"
             >
-              + Thêm lịch thanh toán
+              + Thêm lịch sử thanh toán
             </button>
           </form>
         </div>

@@ -2,22 +2,26 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { CATEGORIES, monthKeyFromDate, formatMonthLabel, formatVnd } from "@/lib/constants";
-import type { Transaction, Income } from "@/lib/types";
+import { categoryTotals } from "@/lib/reportUtils";
+import type { Transaction, Income, CategoryBaseline } from "@/lib/types";
 
 export default function BaoCaoPage() {
   const [month, setMonth] = useState(() => monthKeyFromDate(new Date()));
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
+  const [baselines, setBaselines] = useState<CategoryBaseline[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (m: string) => {
     setLoading(true);
-    const [txRes, incomeRes] = await Promise.all([
+    const [txRes, incomeRes, baselineRes] = await Promise.all([
       fetch(`/api/transactions?month=${m}`),
       fetch(`/api/income?month=${m}`),
+      fetch(`/api/category-baselines?month=${m}`),
     ]);
     setTransactions((await txRes.json()) as Transaction[]);
     setIncomes((await incomeRes.json()) as Income[]);
+    setBaselines((await baselineRes.json()) as CategoryBaseline[]);
     setLoading(false);
   }, []);
 
@@ -26,13 +30,9 @@ export default function BaoCaoPage() {
     load(month);
   }, [month, load]);
 
-  const totalsByCategory = new Map<string, number>();
-  for (const category of CATEGORIES) totalsByCategory.set(category, 0);
-  for (const t of transactions) {
-    totalsByCategory.set(t.category, (totalsByCategory.get(t.category) ?? 0) + t.amount);
-  }
+  const totalsByCategory = categoryTotals(transactions, baselines);
 
-  const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalExpense = [...totalsByCategory.values()].reduce((sum, v) => sum + v, 0);
   const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
   const balance = totalIncome - totalExpense;
 

@@ -1,6 +1,7 @@
 export const CATEGORIES = [
-  "Thiết yếu: Thực phẩm/ gia dụng/ công việc...",
+  "Thiết yếu: Thực phẩm/ gia dụng...",
   "Cà phê/ ăn vặt/ ăn sáng...",
+  "Công việc",
   "Cá nhân: Skincare/ Mỹ phẩm/ Quần áo/ Tóc...",
   "Sức khỏe: Thuốc/ bệnh viện/ bảo hiểm/ thể thao",
   "Biếu/ Hiếu/ hỉ/ Quà tặng",

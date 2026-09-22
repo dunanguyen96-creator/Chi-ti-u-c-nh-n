@@ -5,22 +5,26 @@ import Link from "next/link";
 import IncomeList from "@/components/IncomeList";
 import CategoryBreakdown from "@/components/CategoryBreakdown";
 import { monthKeyFromDate, formatMonthLabel, formatVnd } from "@/lib/constants";
-import type { Transaction, Income } from "@/lib/types";
+import { categoryTotals } from "@/lib/reportUtils";
+import type { Transaction, Income, CategoryBaseline } from "@/lib/types";
 
 export default function DashboardPage() {
   const [month, setMonth] = useState(() => monthKeyFromDate(new Date()));
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
+  const [baselines, setBaselines] = useState<CategoryBaseline[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (m: string) => {
     setLoading(true);
-    const [txRes, incomeRes] = await Promise.all([
+    const [txRes, incomeRes, baselineRes] = await Promise.all([
       fetch(`/api/transactions?month=${m}`),
       fetch(`/api/income?month=${m}`),
+      fetch(`/api/category-baselines?month=${m}`),
     ]);
     setTransactions((await txRes.json()) as Transaction[]);
     setIncomes((await incomeRes.json()) as Income[]);
+    setBaselines((await baselineRes.json()) as CategoryBaseline[]);
     setLoading(false);
   }, []);
 
@@ -29,7 +33,10 @@ export default function DashboardPage() {
     load(month);
   }, [month, load]);
 
-  const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalExpense = [...categoryTotals(transactions, baselines).values()].reduce(
+    (sum, v) => sum + v,
+    0,
+  );
   const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
   const balance = totalIncome - totalExpense;
   const recent = transactions.slice(0, 6);
@@ -84,13 +91,13 @@ export default function DashboardPage() {
           {loading ? (
             <p className="text-sm text-foreground/50 py-6 text-center">Đang tải...</p>
           ) : (
-            <CategoryBreakdown transactions={transactions} />
+            <CategoryBreakdown transactions={transactions} baselines={baselines} />
           )}
         </div>
 
         <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-medium">Giao dịch gần đây</h2>
+            <h2 className="font-medium">Khoản chi gần đây</h2>
             <Link
               href="/giao-dich"
               className="text-sm text-emerald-600 hover:underline"
@@ -102,7 +109,7 @@ export default function DashboardPage() {
             <p className="text-sm text-foreground/50 py-6 text-center">Đang tải...</p>
           ) : recent.length === 0 ? (
             <p className="text-sm text-foreground/50 py-6 text-center">
-              Chưa có giao dịch nào trong tháng này.
+              Chưa có khoản chi nào trong tháng này.
             </p>
           ) : (
             <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">

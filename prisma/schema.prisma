@@ -39,6 +39,17 @@ model Income {
   @@index([month])
 }
 
+model CategoryBaseline {
+  id        String   @id @default(cuid())
+  month     String
+  category  String
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([month, category])
+}
+
 model CreditCard {
   id                   String          @id @default(cuid())
   name                 String          @unique

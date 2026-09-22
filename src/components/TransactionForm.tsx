@@ -53,7 +53,15 @@ export default function TransactionForm({
         const parsed = JSON.parse(raw) as Partial<Draft>;
         // eslint-disable-next-line react-hooks/set-state-in-effect -- restore locally saved draft on mount
         setDraft((d) => ({ ...d, ...parsed }));
-        if (parsed.recordMonth) recordMonthManual.current = true;
+        // Only treat "Tháng ghi nhận" as manually diverged if it doesn't
+        // match what the restored date would compute by default.
+        if (
+          parsed.recordMonth &&
+          parsed.date &&
+          parsed.recordMonth !== monthKeyFromDate(parsed.date)
+        ) {
+          recordMonthManual.current = true;
+        }
         if (parsed.description || parsed.amount) setRestored(true);
       }
     } catch {
@@ -122,7 +130,7 @@ export default function TransactionForm({
       setRestored(false);
       localStorage.removeItem(DRAFT_KEY);
     } catch {
-      setError("Không lưu được giao dịch, thử lại nhé.");
+      setError("Không lưu được khoản chi, thử lại nhé.");
     } finally {
       setSubmitting(false);
     }
@@ -134,7 +142,7 @@ export default function TransactionForm({
       className="rounded-lg border border-black/10 dark:border-white/10 p-4 bg-black/[0.02] dark:bg-white/[0.03]"
     >
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-medium">Thêm giao dịch</h2>
+        <h2 className="font-medium">Thêm khoản chi</h2>
         {restored && (
           <span className="text-xs text-amber-600">
             Đã khôi phục nội dung chưa lưu
@@ -228,7 +236,7 @@ export default function TransactionForm({
           disabled={submitting}
           className="rounded-md bg-emerald-600 text-white px-4 py-1.5 text-sm font-medium hover:bg-emerald-700 disabled:opacity-50"
         >
-          {submitting ? "Đang lưu..." : "+ Thêm giao dịch"}
+          {submitting ? "Đang lưu..." : "+ Thêm khoản chi"}
         </button>
         {error && <span className="text-sm text-rose-600">{error}</span>}
         <span className="text-xs text-foreground/50">

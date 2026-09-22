@@ -1,5 +1,6 @@
 import { CATEGORIES, formatVnd } from "@/lib/constants";
-import type { Transaction } from "@/lib/types";
+import { categoryTotals } from "@/lib/reportUtils";
+import type { Transaction, CategoryBaseline } from "@/lib/types";
 
 const PALETTE = [
   "#0d9488",
@@ -12,6 +13,7 @@ const PALETTE = [
   "#0891b2",
   "#ca8a04",
   "#9333ea",
+  "#4f46e5",
   "#64748b",
 ];
 
@@ -21,13 +23,12 @@ const COLOR_BY_CATEGORY = Object.fromEntries(
 
 export default function CategoryBreakdown({
   transactions,
+  baselines = [],
 }: {
   transactions: Transaction[];
+  baselines?: CategoryBaseline[];
 }) {
-  const totals = new Map<string, number>();
-  for (const t of transactions) {
-    totals.set(t.category, (totals.get(t.category) ?? 0) + t.amount);
-  }
+  const totals = categoryTotals(transactions, baselines);
   const rows = [...totals.entries()]
     .sort((a, b) => b[1] - a[1])
     .filter(([, amount]) => amount > 0);

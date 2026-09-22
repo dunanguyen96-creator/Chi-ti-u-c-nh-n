@@ -18,6 +18,13 @@ export interface Income {
   note: string | null;
 }
 
+export interface CategoryBaseline {
+  id: string;
+  month: string;
+  category: string;
+  amount: number;
+}
+
 export interface CardStatement {
   id: string;
   cardId: string;

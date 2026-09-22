@@ -39,7 +39,7 @@ export default function GiaoDichPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 flex flex-col gap-6 w-full">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-semibold">Giao dịch</h1>
+        <h1 className="text-xl font-semibold">Khoản chi</h1>
         <label className="flex items-center gap-2 text-sm">
           Tháng
           <input
@@ -56,7 +56,7 @@ export default function GiaoDichPage() {
 
       <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
         <h2 className="font-medium mb-3">
-          Danh sách giao dịch — sửa trực tiếp, tự động lưu
+          Danh sách khoản chi — sửa trực tiếp, tự động lưu
         </h2>
         {loading ? (
           <p className="text-sm text-foreground/50 py-6 text-center">Đang tải...</p>

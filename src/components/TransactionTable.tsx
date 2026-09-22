@@ -40,7 +40,7 @@ function TransactionRow({
   }
 
   async function handleDelete() {
-    if (!confirm(`Xoá giao dịch "${description}"?`)) return;
+    if (!confirm(`Xoá khoản chi "${description}"?`)) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/transactions/${transaction.id}`, {
@@ -151,7 +151,7 @@ export default function TransactionTable({
   if (transactions.length === 0) {
     return (
       <p className="text-sm text-foreground/50 py-6 text-center">
-        Chưa có giao dịch nào trong khoảng thời gian này.
+        Chưa có khoản chi nào trong khoảng thời gian này.
       </p>
     );
   }
@@ -181,7 +181,7 @@ export default function TransactionTable({
         <tfoot>
           <tr className="font-medium border-t border-black/10 dark:border-white/10">
             <td className="p-1.5" colSpan={5}>
-              Tổng ({transactions.length} giao dịch)
+              Tổng ({transactions.length} khoản chi)
             </td>
             <td className="p-1.5 text-right">{formatVnd(total)}</td>
             <td colSpan={2}></td>

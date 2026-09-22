@@ -25,13 +25,12 @@ export default function LoanManager({
   const [loanDate, setLoanDate] = useState(todayStr());
   const [termMonths, setTermMonths] = useState("");
   const [interestRate, setInterestRate] = useState("");
-  const [monthlyInterest, setMonthlyInterest] = useState("");
-  const [monthlyPrincipal, setMonthlyPrincipal] = useState("");
+  const [monthlyPayment, setMonthlyPayment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!description || !termMonths || !interestRate || !monthlyInterest || !monthlyPrincipal) return;
+    if (!description || !termMonths || !interestRate || !monthlyPayment) return;
     setSubmitting(true);
     try {
       const res = await fetch("/api/loans", {
@@ -42,8 +41,7 @@ export default function LoanManager({
           loanDate,
           termMonths: Number(termMonths),
           interestRate: Number(interestRate),
-          monthlyInterest: Number(monthlyInterest),
-          monthlyPrincipal: Number(monthlyPrincipal),
+          monthlyPayment: Number(monthlyPayment),
         }),
       });
       if (res.ok) {
@@ -52,8 +50,7 @@ export default function LoanManager({
         setDescription("");
         setTermMonths("");
         setInterestRate("");
-        setMonthlyInterest("");
-        setMonthlyPrincipal("");
+        setMonthlyPayment("");
       }
     } finally {
       setSubmitting(false);
@@ -77,8 +74,6 @@ export default function LoanManager({
               <th className="p-2 font-medium text-right">Ngày vay</th>
               <th className="p-2 font-medium text-right">Kỳ hạn</th>
               <th className="p-2 font-medium text-right">Lãi suất</th>
-              <th className="p-2 font-medium text-right">Lãi hàng tháng</th>
-              <th className="p-2 font-medium text-right">Gốc hàng tháng</th>
               <th className="p-2 font-medium text-right">Tổng trả hàng tháng</th>
               <th className="p-2"></th>
             </tr>
@@ -90,14 +85,8 @@ export default function LoanManager({
                 <td className="p-2 text-right whitespace-nowrap">{l.loanDate.slice(0, 10)}</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.termMonths} tháng</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.interestRate}%</td>
-                <td className="p-2 text-right tabular-nums whitespace-nowrap">
-                  {formatVnd(l.monthlyInterest)}
-                </td>
-                <td className="p-2 text-right tabular-nums whitespace-nowrap">
-                  {formatVnd(l.monthlyPrincipal)}
-                </td>
                 <td className="p-2 text-right tabular-nums font-medium whitespace-nowrap">
-                  {formatVnd(l.monthlyInterest + l.monthlyPrincipal)}
+                  {formatVnd(l.monthlyPayment)}
                 </td>
                 <td className="p-2 text-right">
                   <button
@@ -155,24 +144,16 @@ export default function LoanManager({
           />
         </label>
         <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
-          Lãi hàng tháng
+          Tổng trả hàng tháng
           <MoneyInput
-            value={monthlyInterest}
-            onChange={setMonthlyInterest}
-            className={`${inputClass} w-32`}
-          />
-        </label>
-        <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
-          Gốc hàng tháng
-          <MoneyInput
-            value={monthlyPrincipal}
-            onChange={setMonthlyPrincipal}
+            value={monthlyPayment}
+            onChange={setMonthlyPayment}
             className={`${inputClass} w-32`}
           />
         </label>
         <button
           type="submit"
-          disabled={submitting || !description || !termMonths || !interestRate || !monthlyInterest || !monthlyPrincipal}
+          disabled={submitting || !description || !termMonths || !interestRate || !monthlyPayment}
           className="rounded-lg bg-[var(--accent)] text-white px-3 py-1.5 text-xs font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50"
         >
           + Thêm khoản vay

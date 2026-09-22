@@ -10,15 +10,14 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { description, loanDate, termMonths, interestRate, monthlyInterest, monthlyPrincipal } = body;
+  const { description, loanDate, termMonths, interestRate, monthlyPayment } = body;
 
   if (
     !description ||
     !loanDate ||
     termMonths === undefined ||
     interestRate === undefined ||
-    monthlyInterest === undefined ||
-    monthlyPrincipal === undefined
+    monthlyPayment === undefined
   ) {
     return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 });
   }
@@ -29,8 +28,7 @@ export async function POST(request: NextRequest) {
       loanDate: new Date(loanDate),
       termMonths: Math.round(Number(termMonths)),
       interestRate: Number(interestRate),
-      monthlyInterest: Math.round(Number(monthlyInterest)),
-      monthlyPrincipal: Math.round(Number(monthlyPrincipal)),
+      monthlyPayment: Math.round(Number(monthlyPayment)),
     },
   });
 

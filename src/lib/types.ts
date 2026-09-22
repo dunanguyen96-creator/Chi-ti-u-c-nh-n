@@ -54,8 +54,7 @@ export interface Loan {
   loanDate: string;
   termMonths: number;
   interestRate: number;
-  monthlyInterest: number;
-  monthlyPrincipal: number;
+  monthlyPayment: number;
 }
 
 export interface CardStatement {

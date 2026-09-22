@@ -86,15 +86,14 @@ model Installment {
 }
 
 model Loan {
-  id               String   @id @default(cuid())
-  description      String
-  loanDate         DateTime
-  termMonths       Int
-  interestRate     Float
-  monthlyInterest  Int
-  monthlyPrincipal Int
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id             String   @id @default(cuid())
+  description    String
+  loanDate       DateTime
+  termMonths     Int
+  interestRate   Float
+  monthlyPayment Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model CreditCard {

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDebouncedSave } from "@/lib/useDebouncedSave";
 import SaveStatusBadge from "@/components/SaveStatusBadge";
 import MoneyInput from "@/components/MoneyInput";
-import { formatVnd } from "@/lib/constants";
+import { formatVnd, formatDateDMY } from "@/lib/constants";
 import { cardTheme } from "@/lib/cardThemes";
 import type { CreditCard, CardStatement, CardPayment } from "@/lib/types";
 
@@ -62,7 +62,7 @@ function StatementRow({
       className={`row-hover row-hover-edge py-2 px-2 -mx-2 rounded-md flex items-center justify-between gap-2 flex-wrap ${rowTone}`}
     >
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs text-foreground/50">{statement.date.slice(0, 10)}</span>
+        <span className="text-xs text-foreground/50">{formatDateDMY(statement.date)}</span>
         <span className={`tabular-nums ${owing ? "font-bold text-base" : ""}`}>
           {formatVnd(statement.balance)}
         </span>
@@ -73,7 +73,7 @@ function StatementRow({
           {!owing
             ? "Đã trả hết"
             : statement.dueDate
-              ? `Hạn TT ${statement.dueDate.slice(0, 10)}${urgent ? " · Gấp!" : ""}`
+              ? `Hạn TT ${formatDateDMY(statement.dueDate)}${urgent ? " · Gấp!" : ""}`
               : "Chưa có hạn TT"}
         </span>
       </div>
@@ -262,7 +262,7 @@ export default function CreditCardCard({
             <span>⚠️ Cần thanh toán {formatVnd(nextDue.remaining)}</span>
             <span className="text-sm">
               {nextDue.statement.dueDate
-                ? `trước ${nextDue.statement.dueDate.slice(0, 10)}`
+                ? `trước ${formatDateDMY(nextDue.statement.dueDate)}`
                 : "chưa có hạn thanh toán"}
             </span>
           </div>
@@ -366,10 +366,10 @@ export default function CreditCardCard({
                       className="row-hover row-hover-edge py-1 px-2 -mx-2 flex items-center justify-between gap-2 flex-wrap"
                     >
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span>{p.date.slice(0, 10)}</span>
+                        <span>{formatDateDMY(p.date)}</span>
                         {statement && (
                           <span className="text-xs text-foreground/50">
-                            (trả sao kê {statement.date.slice(0, 10)})
+                            (trả sao kê {formatDateDMY(statement.date)})
                           </span>
                         )}
                       </div>
@@ -410,7 +410,7 @@ export default function CreditCardCard({
                       const remaining = remainingFor(s, card.payments);
                       return (
                         <option key={s.id} value={s.id}>
-                          {s.date.slice(0, 10)} ·{" "}
+                          {formatDateDMY(s.date)} ·{" "}
                           {remaining > 0 ? `còn lại ${formatVnd(remaining)}` : "đã trả hết"}
                         </option>
                       );

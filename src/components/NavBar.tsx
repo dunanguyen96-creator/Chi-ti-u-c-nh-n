@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HomeIcon, ListIcon, ChartIcon, CardIcon } from "@/components/icons";
+import LiveClock from "@/components/LiveClock";
 
 const LINKS = [
   { href: "/", label: "Tổng quan", Icon: HomeIcon },
@@ -39,6 +40,7 @@ export default function NavBar() {
             );
           })}
         </nav>
+        <LiveClock />
       </div>
     </header>
   );

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import MoneyInput from "@/components/MoneyInput";
-import { formatVnd } from "@/lib/constants";
+import { formatVnd, formatDateDMY } from "@/lib/constants";
 import type { Loan } from "@/lib/types";
 
 const inputClass =
@@ -82,7 +82,7 @@ export default function LoanManager({
             {loans.map((l) => (
               <tr key={l.id} className="row-hover border-b border-black/5 dark:border-white/10">
                 <td className="row-hover-edge p-2 whitespace-nowrap">{l.description}</td>
-                <td className="p-2 text-right whitespace-nowrap">{l.loanDate.slice(0, 10)}</td>
+                <td className="p-2 text-right whitespace-nowrap">{formatDateDMY(l.loanDate)}</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.termMonths} tháng</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.interestRate}%</td>
                 <td className="p-2 text-right tabular-nums font-medium whitespace-nowrap">

@@ -29,6 +29,12 @@ export function formatMonthLabel(monthKey: string): string {
   return `${month}/${year.slice(2)}`;
 }
 
+// "YYYY-MM-DD" (or a longer ISO string) -> "DD-MM-YYYY".
+export function formatDateDMY(dateStr: string): string {
+  const [year, month, day] = dateStr.slice(0, 10).split("-");
+  return `${day}-${month}-${year}`;
+}
+
 export function shiftMonth(monthKey: string, delta: number): string {
   const [year, month] = monthKey.split("-").map(Number);
   const d = new Date(year, month - 1 + delta, 1);

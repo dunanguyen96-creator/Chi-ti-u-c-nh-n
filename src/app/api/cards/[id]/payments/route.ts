@@ -15,6 +15,7 @@ export async function POST(
   const payment = await prisma.cardPayment.create({
     data: {
       cardId: id,
+      statementId: body.statementId || null,
       date: new Date(body.date),
       amount: Math.round(Number(body.amount)),
     },

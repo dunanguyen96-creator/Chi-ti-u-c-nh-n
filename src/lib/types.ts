@@ -36,6 +36,7 @@ export interface CardStatement {
 export interface CardPayment {
   id: string;
   cardId: string;
+  statementId: string | null;
   date: string;
   amount: number;
 }

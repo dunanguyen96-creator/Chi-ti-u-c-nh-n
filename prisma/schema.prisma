@@ -60,24 +60,28 @@ model CreditCard {
 }
 
 model CardStatement {
-  id        String     @id @default(cuid())
+  id        String        @id @default(cuid())
   cardId    String
-  card      CreditCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  card      CreditCard    @relation(fields: [cardId], references: [id], onDelete: Cascade)
   date      DateTime
   balance   Int
   dueDate   DateTime?
-  createdAt DateTime   @default(now())
+  createdAt DateTime      @default(now())
+  payments  CardPayment[]
 
   @@index([cardId])
 }
 
 model CardPayment {
-  id        String     @id @default(cuid())
-  cardId    String
-  card      CreditCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  date      DateTime
-  amount    Int
-  createdAt DateTime   @default(now())
+  id          String         @id @default(cuid())
+  cardId      String
+  card        CreditCard     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  statementId String?
+  statement   CardStatement? @relation(fields: [statementId], references: [id], onDelete: SetNull)
+  date        DateTime
+  amount      Int
+  createdAt   DateTime       @default(now())
 
   @@index([cardId])
+  @@index([statementId])
 }

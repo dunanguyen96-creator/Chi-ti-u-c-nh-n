@@ -30,12 +30,7 @@ export default function CreditCardCard({
     card.installmentAmount != null ? String(card.installmentAmount) : "",
   );
   const [installmentTerm, setInstallmentTerm] = useState(card.installmentTerm ?? "");
-  const [statementClosingDay, setStatementClosingDay] = useState(
-    card.statementClosingDay != null ? String(card.statementClosingDay) : "",
-  );
-  const [paymentDueDay, setPaymentDueDay] = useState(
-    card.paymentDueDay != null ? String(card.paymentDueDay) : "",
-  );
+  const [note, setNote] = useState(card.note ?? "");
   const [deleting, setDeleting] = useState(false);
 
   const { status, trigger } = useDebouncedSave(async (patch: Record<string, unknown>) => {
@@ -175,31 +170,18 @@ export default function CreditCardCard({
             className={inputClass}
           />
         </label>
-        <label className="flex flex-col gap-1 text-xs text-foreground/60">
-          Ngày chốt sao kê (hàng tháng)
-          <input
-            type="number"
-            min={1}
-            max={31}
-            placeholder="VD: 22"
-            value={statementClosingDay}
-            onChange={(e) => field(setStatementClosingDay, "statementClosingDay")(e.target.value)}
-            className={inputClass}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-xs text-foreground/60">
-          Ngày thanh toán (hàng tháng)
-          <input
-            type="number"
-            min={1}
-            max={31}
-            placeholder="VD: 5"
-            value={paymentDueDay}
-            onChange={(e) => field(setPaymentDueDay, "paymentDueDay")(e.target.value)}
-            className={inputClass}
-          />
-        </label>
       </div>
+
+      <label className="flex flex-col gap-1 text-xs text-foreground/60">
+        Ghi chú
+        <textarea
+          rows={2}
+          placeholder="VD: chốt sao kê ngày 22, thanh toán ngày 5 hàng tháng"
+          value={note}
+          onChange={(e) => field(setNote, "note")(e.target.value)}
+          className={`${inputClass} resize-none`}
+        />
+      </label>
 
       <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
         <span className="text-sm text-foreground/60">Dư nợ dự kiến ({monthLabel})</span>

@@ -1,0 +1,70 @@
+import { CATEGORIES, formatVnd } from "@/lib/constants";
+import type { Transaction } from "@/lib/types";
+
+const PALETTE = [
+  "#0d9488",
+  "#2563eb",
+  "#db2777",
+  "#d97706",
+  "#7c3aed",
+  "#059669",
+  "#dc2626",
+  "#0891b2",
+  "#ca8a04",
+  "#9333ea",
+  "#64748b",
+];
+
+const COLOR_BY_CATEGORY = Object.fromEntries(
+  CATEGORIES.map((c, i) => [c, PALETTE[i % PALETTE.length]]),
+);
+
+export default function CategoryBreakdown({
+  transactions,
+}: {
+  transactions: Transaction[];
+}) {
+  const totals = new Map<string, number>();
+  for (const t of transactions) {
+    totals.set(t.category, (totals.get(t.category) ?? 0) + t.amount);
+  }
+  const rows = [...totals.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .filter(([, amount]) => amount > 0);
+
+  const max = rows.length > 0 ? rows[0][1] : 1;
+
+  if (rows.length === 0) {
+    return (
+      <p className="text-sm text-foreground/50 py-4 text-center">
+        Chưa có dữ liệu chi tiêu.
+      </p>
+    );
+  }
+
+  return (
+    <ul className="flex flex-col gap-2.5">
+      {rows.map(([category, amount]) => (
+        <li key={category} className="flex flex-col gap-1">
+          <div className="flex justify-between text-sm gap-2">
+            <span className="truncate" title={category}>
+              {category}
+            </span>
+            <span className="shrink-0 tabular-nums text-foreground/70">
+              {formatVnd(amount)}
+            </span>
+          </div>
+          <div className="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${Math.max((amount / max) * 100, 3)}%`,
+                backgroundColor: COLOR_BY_CATEGORY[category] ?? "#64748b",
+              }}
+            />
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}

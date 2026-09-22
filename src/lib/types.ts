@@ -30,6 +30,7 @@ export interface CardStatement {
   cardId: string;
   date: string;
   balance: number;
+  dueDate: string | null;
 }
 
 export interface CardPayment {
@@ -42,10 +43,6 @@ export interface CardPayment {
 export interface CreditCard {
   id: string;
   name: string;
-  cardLimit: number | null;
-  installmentAmount: number | null;
-  installmentTerm: string | null;
-  note: string | null;
   statements: CardStatement[];
   payments: CardPayment[];
 }

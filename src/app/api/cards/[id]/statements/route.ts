@@ -17,6 +17,7 @@ export async function POST(
       cardId: id,
       date: new Date(body.date),
       balance: Math.round(Number(body.balance)),
+      dueDate: body.dueDate ? new Date(body.dueDate) : null,
     },
   });
 

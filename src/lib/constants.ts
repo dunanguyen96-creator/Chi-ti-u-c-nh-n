@@ -15,13 +15,7 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
-export const CARDS = [
-  "Tech 6505",
-  "VPbank 4264",
-  "VCB Sig 0328",
-  "VCB Pla 9823",
-  "Mycash thấu chi",
-] as const;
+export const CARDS = ["Tech 6505", "VPbank 4264", "VCB Sig 0328", "Mycash thấu chi"] as const;
 
 export function monthKeyFromDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;

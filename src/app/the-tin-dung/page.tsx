@@ -65,7 +65,6 @@ export default function TheTinDungPage() {
             <CreditCardCard
               key={c.id}
               card={c}
-              monthLabel={formatMonthLabel(month)}
               monthTotal={totalForCard(c.name)}
               onUpdated={handleUpdated}
               onDeleted={handleDeleted}

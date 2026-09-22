@@ -5,49 +5,92 @@ import { useDebouncedSave } from "@/lib/useDebouncedSave";
 import SaveStatusBadge from "@/components/SaveStatusBadge";
 import MoneyInput from "@/components/MoneyInput";
 import { formatVnd } from "@/lib/constants";
-import type { CreditCard } from "@/lib/types";
+import { cardTheme } from "@/lib/cardThemes";
+import type { CreditCard, CardStatement } from "@/lib/types";
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+const inputClass =
+  "rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5 text-sm";
+
+function StatementRow({
+  cardId,
+  statement,
+  onDeleted,
+}: {
+  cardId: string;
+  statement: CardStatement;
+  onDeleted: (id: string) => void;
+}) {
+  const [dueDate, setDueDate] = useState(statement.dueDate?.slice(0, 10) ?? "");
+
+  const { status, trigger } = useDebouncedSave(async (value: string) => {
+    const res = await fetch(`/api/cards/${cardId}/statements/${statement.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dueDate: value || null }),
+    });
+    if (!res.ok) throw new Error("save failed");
+  });
+
+  async function handleDelete() {
+    const res = await fetch(`/api/cards/${cardId}/statements/${statement.id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) onDeleted(statement.id);
+  }
+
+  return (
+    <li className="py-1.5 flex items-center justify-between gap-2 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span>{statement.date.slice(0, 10)}</span>
+        <span className="tabular-nums">{formatVnd(statement.balance)}</span>
+        <label className="flex items-center gap-1 text-xs text-foreground/60">
+          Hạn TT
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => {
+              setDueDate(e.target.value);
+              trigger(e.target.value);
+            }}
+            className={`${inputClass} py-1`}
+          />
+          <SaveStatusBadge status={status} />
+        </label>
+      </div>
+      <button onClick={handleDelete} className="text-rose-600 hover:text-rose-700 text-xs">
+        Xoá
+      </button>
+    </li>
+  );
+}
+
 export default function CreditCardCard({
   card,
-  monthLabel,
   monthTotal,
   onUpdated,
   onDeleted,
 }: {
   card: CreditCard;
-  monthLabel: string;
   monthTotal: number;
   onUpdated: (c: CreditCard) => void;
   onDeleted: (id: string) => void;
 }) {
   const [name, setName] = useState(card.name);
-  const [cardLimit, setCardLimit] = useState(card.cardLimit != null ? String(card.cardLimit) : "");
-  const [installmentAmount, setInstallmentAmount] = useState(
-    card.installmentAmount != null ? String(card.installmentAmount) : "",
-  );
-  const [installmentTerm, setInstallmentTerm] = useState(card.installmentTerm ?? "");
-  const [note, setNote] = useState(card.note ?? "");
   const [deleting, setDeleting] = useState(false);
+  const theme = cardTheme(card.name);
 
-  const { status, trigger } = useDebouncedSave(async (patch: Record<string, unknown>) => {
+  const { status, trigger } = useDebouncedSave(async (value: string) => {
     const res = await fetch(`/api/cards/${card.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
+      body: JSON.stringify({ name: value }),
     });
     if (!res.ok) throw new Error("save failed");
   });
-
-  function field<T>(setter: (v: T) => void, key: string) {
-    return (value: T) => {
-      setter(value);
-      trigger({ [key]: value });
-    };
-  }
 
   async function handleDelete() {
     if (!confirm(`Xoá thẻ "${name}"?`)) return;
@@ -60,10 +103,9 @@ export default function CreditCardCard({
     }
   }
 
-  const expectedBalance = monthTotal + (Number(installmentAmount) || 0);
-
   const [stDate, setStDate] = useState(todayStr());
   const [stBalance, setStBalance] = useState("");
+  const [stDueDate, setStDueDate] = useState("");
   const [stSubmitting, setStSubmitting] = useState(false);
 
   async function addStatement(e: React.FormEvent) {
@@ -74,21 +116,21 @@ export default function CreditCardCard({
       const res = await fetch(`/api/cards/${card.id}/statements`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date: stDate, balance: Number(stBalance) }),
+        body: JSON.stringify({ date: stDate, balance: Number(stBalance), dueDate: stDueDate || null }),
       });
       if (res.ok) {
         const created = await res.json();
         onUpdated({ ...card, statements: [created, ...card.statements] });
         setStBalance("");
+        setStDueDate("");
       }
     } finally {
       setStSubmitting(false);
     }
   }
 
-  async function deleteStatement(id: string) {
-    const res = await fetch(`/api/cards/${card.id}/statements/${id}`, { method: "DELETE" });
-    if (res.ok) onUpdated({ ...card, statements: card.statements.filter((s) => s.id !== id) });
+  function handleStatementDeleted(id: string) {
+    onUpdated({ ...card, statements: card.statements.filter((s) => s.id !== id) });
   }
 
   const [pDate, setPDate] = useState(todayStr());
@@ -120,157 +162,132 @@ export default function CreditCardCard({
     if (res.ok) onUpdated({ ...card, payments: card.payments.filter((p) => p.id !== id) });
   }
 
-  const inputClass =
-    "rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5 text-sm";
-
   return (
-    <div className="rounded-lg border border-black/10 dark:border-white/10 p-4 flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
+    <div className="rounded-lg border border-black/10 dark:border-white/10 overflow-hidden flex flex-col">
+      <div className={`${theme.header} px-4 py-3 flex items-center justify-between gap-3 flex-wrap`}>
         <input
           value={name}
-          onChange={(e) => field(setName, "name")(e.target.value)}
-          className="font-medium text-base bg-transparent outline-none border-b border-transparent focus:border-emerald-500 px-0.5"
+          onChange={(e) => {
+            setName(e.target.value);
+            trigger(e.target.value);
+          }}
+          className={`font-medium text-base bg-transparent outline-none border-b border-transparent focus:border-current px-0.5 ${theme.headerText}`}
         />
         <div className="flex items-center gap-3">
-          <SaveStatusBadge status={status} />
+          <span className={theme.headerSubtext}>
+            <SaveStatusBadge status={status} />
+          </span>
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="text-rose-600 hover:text-rose-700 text-xs disabled:opacity-50"
+            className={`text-xs underline disabled:opacity-50 ${theme.headerText}`}
           >
             Xoá thẻ
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <label className="flex flex-col gap-1 text-xs text-foreground/60">
-          Hạn mức
-          <MoneyInput
-            value={cardLimit}
-            onChange={field(setCardLimit, "cardLimit")}
-            className={inputClass}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-xs text-foreground/60">
-          Trả góp hàng tháng
-          <MoneyInput
-            value={installmentAmount}
-            onChange={field(setInstallmentAmount, "installmentAmount")}
-            className={inputClass}
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-xs text-foreground/60">
-          Kỳ hạn
-          <input
-            type="text"
-            placeholder="VD: 24 tháng"
-            value={installmentTerm}
-            onChange={(e) => field(setInstallmentTerm, "installmentTerm")(e.target.value)}
-            className={inputClass}
-          />
-        </label>
+      <div className="p-4 flex flex-col gap-3">
+        {monthTotal > 0 && (
+          <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
+            <span className="text-sm text-foreground/60">Chi tiêu tháng này</span>
+            <span className="font-semibold text-rose-600">{formatVnd(monthTotal)}</span>
+          </div>
+        )}
+
+        <details className="text-sm" open>
+          <summary className="cursor-pointer font-medium text-foreground/80">
+            Sao kê ({card.statements.length})
+          </summary>
+          <div className="mt-2 flex flex-col gap-2">
+            {card.statements.length > 0 && (
+              <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
+                {card.statements.map((s) => (
+                  <StatementRow
+                    key={s.id}
+                    cardId={card.id}
+                    statement={s}
+                    onDeleted={handleStatementDeleted}
+                  />
+                ))}
+              </ul>
+            )}
+            <form onSubmit={addStatement} className="flex items-center gap-2 flex-wrap">
+              <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
+                Ngày sao kê
+                <input
+                  type="date"
+                  value={stDate}
+                  onChange={(e) => setStDate(e.target.value)}
+                  className={inputClass}
+                />
+              </label>
+              <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
+                Số tiền
+                <MoneyInput value={stBalance} onChange={setStBalance} className={`${inputClass} w-32`} />
+              </label>
+              <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
+                Hạn thanh toán
+                <input
+                  type="date"
+                  value={stDueDate}
+                  onChange={(e) => setStDueDate(e.target.value)}
+                  className={inputClass}
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={stSubmitting || !stBalance}
+                className="rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-emerald-700 disabled:opacity-50 self-end"
+              >
+                + Thêm sao kê
+              </button>
+            </form>
+          </div>
+        </details>
+
+        <details className="text-sm">
+          <summary className="cursor-pointer font-medium text-foreground/80">
+            Lịch sử thanh toán ({card.payments.length})
+          </summary>
+          <div className="mt-2 flex flex-col gap-2">
+            {card.payments.length > 0 && (
+              <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
+                {card.payments.map((p) => (
+                  <li key={p.id} className="py-1 flex items-center justify-between gap-2">
+                    <span>{p.date.slice(0, 10)}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="tabular-nums">{formatVnd(p.amount)}</span>
+                      <button
+                        onClick={() => deletePayment(p.id)}
+                        className="text-rose-600 hover:text-rose-700 text-xs"
+                      >
+                        Xoá
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <form onSubmit={addPayment} className="flex items-center gap-2 flex-wrap">
+              <input
+                type="date"
+                value={pDate}
+                onChange={(e) => setPDate(e.target.value)}
+                className={inputClass}
+              />
+              <MoneyInput value={pAmount} onChange={setPAmount} className={`${inputClass} w-32`} />
+              <button
+                type="submit"
+                disabled={pSubmitting || !pAmount}
+                className="rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-emerald-700 disabled:opacity-50"
+              >
+                + Thêm lịch sử thanh toán
+              </button>
+            </form>
+          </div>
+        </details>
       </div>
-
-      <label className="flex flex-col gap-1 text-xs text-foreground/60">
-        Ghi chú
-        <textarea
-          rows={2}
-          placeholder="VD: chốt sao kê ngày 22, thanh toán ngày 5 hàng tháng"
-          value={note}
-          onChange={(e) => field(setNote, "note")(e.target.value)}
-          className={`${inputClass} resize-none`}
-        />
-      </label>
-
-      <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
-        <span className="text-sm text-foreground/60">Dư nợ dự kiến ({monthLabel})</span>
-        <span className="font-semibold text-rose-600">{formatVnd(expectedBalance)}</span>
-      </div>
-
-      <details className="text-sm">
-        <summary className="cursor-pointer font-medium text-foreground/80">
-          Sao kê ({card.statements.length})
-        </summary>
-        <div className="mt-2 flex flex-col gap-2">
-          {card.statements.length > 0 && (
-            <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
-              {card.statements.map((s) => (
-                <li key={s.id} className="py-1 flex items-center justify-between gap-2">
-                  <span>{s.date.slice(0, 10)}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="tabular-nums">{formatVnd(s.balance)}</span>
-                    <button
-                      onClick={() => deleteStatement(s.id)}
-                      className="text-rose-600 hover:text-rose-700 text-xs"
-                    >
-                      Xoá
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-          <form onSubmit={addStatement} className="flex items-center gap-2 flex-wrap">
-            <input
-              type="date"
-              value={stDate}
-              onChange={(e) => setStDate(e.target.value)}
-              className={inputClass}
-            />
-            <MoneyInput value={stBalance} onChange={setStBalance} className={`${inputClass} w-32`} />
-            <button
-              type="submit"
-              disabled={stSubmitting || !stBalance}
-              className="rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-emerald-700 disabled:opacity-50"
-            >
-              + Thêm sao kê
-            </button>
-          </form>
-        </div>
-      </details>
-
-      <details className="text-sm">
-        <summary className="cursor-pointer font-medium text-foreground/80">
-          Lịch sử thanh toán ({card.payments.length})
-        </summary>
-        <div className="mt-2 flex flex-col gap-2">
-          {card.payments.length > 0 && (
-            <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
-              {card.payments.map((p) => (
-                <li key={p.id} className="py-1 flex items-center justify-between gap-2">
-                  <span>{p.date.slice(0, 10)}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="tabular-nums">{formatVnd(p.amount)}</span>
-                    <button
-                      onClick={() => deletePayment(p.id)}
-                      className="text-rose-600 hover:text-rose-700 text-xs"
-                    >
-                      Xoá
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-          <form onSubmit={addPayment} className="flex items-center gap-2 flex-wrap">
-            <input
-              type="date"
-              value={pDate}
-              onChange={(e) => setPDate(e.target.value)}
-              className={inputClass}
-            />
-            <MoneyInput value={pAmount} onChange={setPAmount} className={`${inputClass} w-32`} />
-            <button
-              type="submit"
-              disabled={pSubmitting || !pAmount}
-              className="rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-emerald-700 disabled:opacity-50"
-            >
-              + Thêm lịch sử thanh toán
-            </button>
-          </form>
-        </div>
-      </details>
     </div>
   );
 }

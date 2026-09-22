@@ -10,15 +10,6 @@ export async function PATCH(
   const data: Record<string, unknown> = {};
 
   if (body.name !== undefined) data.name = body.name;
-  if (body.installmentTerm !== undefined) data.installmentTerm = body.installmentTerm || null;
-  if (body.cardLimit !== undefined) {
-    data.cardLimit = body.cardLimit === null || body.cardLimit === "" ? null : Number(body.cardLimit);
-  }
-  if (body.installmentAmount !== undefined) {
-    data.installmentAmount =
-      body.installmentAmount === null || body.installmentAmount === "" ? null : Number(body.installmentAmount);
-  }
-  if (body.note !== undefined) data.note = body.note || null;
 
   const card = await prisma.creditCard.update({
     where: { id },

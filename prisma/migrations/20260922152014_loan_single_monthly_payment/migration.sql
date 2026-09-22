@@ -1,12 +1,12 @@
-/*
-  Warnings:
+-- Add monthlyPayment nullable first, backfill it from the old columns for
+-- any existing rows, then enforce NOT NULL and drop the old columns. Doing
+-- it all in one ALTER TABLE (drop + add NOT NULL with no default) fails
+-- outright on a non-empty table — this is the safe, data-preserving order.
+ALTER TABLE "Loan" ADD COLUMN "monthlyPayment" INTEGER;
 
-  - You are about to drop the column `monthlyInterest` on the `Loan` table. All the data in the column will be lost.
-  - You are about to drop the column `monthlyPrincipal` on the `Loan` table. All the data in the column will be lost.
-  - Added the required column `monthlyPayment` to the `Loan` table without a default value. This is not possible if the table is not empty.
+UPDATE "Loan" SET "monthlyPayment" = "monthlyInterest" + "monthlyPrincipal";
 
-*/
--- AlterTable
-ALTER TABLE "Loan" DROP COLUMN "monthlyInterest",
-DROP COLUMN "monthlyPrincipal",
-ADD COLUMN     "monthlyPayment" INTEGER NOT NULL;
+ALTER TABLE "Loan" ALTER COLUMN "monthlyPayment" SET NOT NULL;
+
+ALTER TABLE "Loan" DROP COLUMN "monthlyInterest";
+ALTER TABLE "Loan" DROP COLUMN "monthlyPrincipal";

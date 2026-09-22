@@ -138,8 +138,8 @@ export default function CategoryDonutChart({
             {arcs.map((s, i) => (
               <li
                 key={s.category}
-                className={`flex items-center justify-between gap-2 rounded px-1.5 py-1 cursor-pointer ${
-                  active === i ? "bg-black/5 dark:bg-white/10" : ""
+                className={`flex items-center justify-between gap-2 rounded px-1.5 py-1 cursor-pointer border-l-2 transition-colors ${
+                  active === i ? "bg-[var(--accent-soft)] border-l-[var(--accent)]" : "border-l-transparent"
                 }`}
                 onMouseEnter={() => setActive(i)}
                 onMouseLeave={() => setActive(null)}

@@ -74,8 +74,8 @@ export default function InstallmentManager({
           </thead>
           <tbody>
             {installments.map((i) => (
-              <tr key={i.id} className="border-b border-black/5 dark:border-white/10">
-                <td className="p-2 whitespace-nowrap">{i.card}</td>
+              <tr key={i.id} className="row-hover border-b border-black/5 dark:border-white/10">
+                <td className="row-hover-edge p-2 whitespace-nowrap">{i.card}</td>
                 <td className="p-2 text-right tabular-nums whitespace-nowrap">
                   {formatVnd(i.totalAmount)}
                 </td>

@@ -114,7 +114,10 @@ export default function DashboardPage() {
           ) : (
             <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
               {recent.map((t) => (
-                <li key={t.id} className="py-2 flex justify-between gap-2 text-sm">
+                <li
+                  key={t.id}
+                  className="row-hover row-hover-edge py-2 px-2 -mx-2 flex justify-between gap-2 text-sm"
+                >
                   <div className="flex flex-col">
                     <span>{t.description}</span>
                     <span className="text-xs text-foreground/50">{t.category}</span>

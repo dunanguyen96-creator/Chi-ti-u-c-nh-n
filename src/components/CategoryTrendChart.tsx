@@ -208,7 +208,7 @@ export default function CategoryTrendChart({
           return (
             <label
               key={category}
-              className="flex items-center gap-1.5 text-xs cursor-pointer select-none"
+              className="flex items-center gap-1.5 text-xs cursor-pointer select-none px-1.5 py-0.5 -mx-1.5 -my-0.5 rounded-md transition-colors hover:bg-[var(--accent-soft)]"
             >
               <input
                 type="checkbox"

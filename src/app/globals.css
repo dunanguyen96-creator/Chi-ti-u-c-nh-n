@@ -76,3 +76,24 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Shared row/item hover treatment: soft background tint + accent left edge.
+   Put .row-hover on the row/li itself, and .row-hover-edge on the element
+   that should carry the accent bar (the row/li itself for lists, or the
+   first <td> for tables — border-left on <tr> doesn't render reliably
+   under border-collapse, so the edge lives on the first cell instead). */
+.row-hover {
+  transition: background-color 150ms ease;
+}
+.row-hover:hover {
+  background-color: var(--accent-soft);
+}
+.row-hover-edge {
+  border-left: 2px solid transparent;
+  transition: border-color 150ms ease;
+}
+.row-hover:hover .row-hover-edge,
+.row-hover-edge.row-hover:hover,
+.row-hover-edge:hover {
+  border-left-color: var(--accent);
+}

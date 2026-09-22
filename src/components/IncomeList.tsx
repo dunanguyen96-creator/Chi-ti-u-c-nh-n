@@ -55,7 +55,10 @@ export default function IncomeList({
       {incomes.length > 0 && (
         <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10 text-sm">
           {incomes.map((i) => (
-            <li key={i.id} className="py-1.5 flex items-center justify-between gap-2">
+            <li
+              key={i.id}
+              className="row-hover row-hover-edge py-1.5 px-2 -mx-2 flex items-center justify-between gap-2"
+            >
               <span className="text-foreground/70 truncate">{i.note || "Thu nhập"}</span>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="tabular-nums">{formatVnd(i.amount)}</span>

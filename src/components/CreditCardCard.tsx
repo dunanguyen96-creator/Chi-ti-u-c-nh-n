@@ -35,7 +35,20 @@ function StatementRow({
   remaining: number;
   onDeleted: (id: string) => void;
 }) {
-  const urgent = Boolean(statement.dueDate) && remaining > 0 && daysUntil(statement.dueDate!) <= 3;
+  const owing = remaining > 0;
+  const urgent = owing && Boolean(statement.dueDate) && daysUntil(statement.dueDate!) <= 3;
+  const pending = owing && !urgent;
+
+  const rowTone = urgent
+    ? "bg-rose-50 dark:bg-rose-950/40"
+    : pending
+      ? "bg-amber-50 dark:bg-amber-950/20"
+      : "";
+  const badgeTone = urgent
+    ? "bg-rose-600 text-white"
+    : pending
+      ? "bg-amber-500 text-white"
+      : "bg-emerald-600 text-white";
 
   async function handleDelete() {
     const res = await fetch(`/api/cards/${cardId}/statements/${statement.id}`, {
@@ -46,24 +59,22 @@ function StatementRow({
 
   return (
     <li
-      className={`py-1.5 flex items-center justify-between gap-2 flex-wrap ${
-        urgent ? "bg-rose-50 dark:bg-rose-950/40 rounded-md px-2 -mx-2" : ""
-      }`}
+      className={`row-hover row-hover-edge py-2 px-2 -mx-2 rounded-md flex items-center justify-between gap-2 flex-wrap ${rowTone}`}
     >
       <div className="flex items-center gap-2 flex-wrap">
-        <span>{statement.date.slice(0, 10)}</span>
-        <span className="tabular-nums">{formatVnd(statement.balance)}</span>
-        {remaining <= 0 ? (
-          <span className="text-xs text-emerald-600">Đã trả hết</span>
-        ) : (
-          remaining !== statement.balance && (
-            <span className="text-xs text-foreground/50">
-              (còn lại {formatVnd(remaining)})
-            </span>
-          )
+        <span className="text-xs text-foreground/50">{statement.date.slice(0, 10)}</span>
+        <span className={`tabular-nums ${owing ? "font-bold text-base" : ""}`}>
+          {formatVnd(statement.balance)}
+        </span>
+        {owing && remaining !== statement.balance && (
+          <span className="text-xs text-foreground/50">(còn lại {formatVnd(remaining)})</span>
         )}
-        <span className={`text-xs ${urgent ? "font-semibold text-rose-600" : "text-foreground/60"}`}>
-          Hạn TT: {statement.dueDate ? statement.dueDate.slice(0, 10) : "–"}
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${badgeTone}`}>
+          {!owing
+            ? "Đã trả hết"
+            : statement.dueDate
+              ? `Hạn TT ${statement.dueDate.slice(0, 10)}${urgent ? " · Gấp!" : ""}`
+              : "Chưa có hạn TT"}
         </span>
       </div>
       <button onClick={handleDelete} className="text-rose-600 hover:text-rose-700 text-xs">
@@ -123,6 +134,20 @@ export default function CreditCardCard({
       .reduce((sum, p) => sum + p.amount, 0);
     return statement.balance - paid;
   }
+
+  // Soonest-due statement still owing money, surfaced as a banner so it's
+  // visible without expanding Sao kê — statements with no due date sort last.
+  const nextDue = card.statements
+    .map((s) => ({ statement: s, remaining: remainingFor(s, card.payments) }))
+    .filter((x) => x.remaining > 0)
+    .sort((a, b) => {
+      if (!a.statement.dueDate && !b.statement.dueDate) return 0;
+      if (!a.statement.dueDate) return 1;
+      if (!b.statement.dueDate) return -1;
+      return a.statement.dueDate.localeCompare(b.statement.dueDate);
+    })[0];
+  const nextDueUrgent =
+    nextDue && Boolean(nextDue.statement.dueDate) && daysUntil(nextDue.statement.dueDate!) <= 3;
 
   const [stDate, setStDate] = useState(todayStr());
   const [stBalance, setStBalance] = useState("");
@@ -228,6 +253,21 @@ export default function CreditCardCard({
       </div>
 
       <div className="p-4 flex flex-col gap-3">
+        {nextDue && (
+          <div
+            className={`rounded-lg px-3 py-2.5 flex items-center justify-between gap-2 flex-wrap font-medium text-white ${
+              nextDueUrgent ? "bg-rose-600" : "bg-amber-500"
+            }`}
+          >
+            <span>⚠️ Cần thanh toán {formatVnd(nextDue.remaining)}</span>
+            <span className="text-sm">
+              {nextDue.statement.dueDate
+                ? `trước ${nextDue.statement.dueDate.slice(0, 10)}`
+                : "chưa có hạn thanh toán"}
+            </span>
+          </div>
+        )}
+
         {isOverdraft ? (
           <>
             <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
@@ -321,7 +361,10 @@ export default function CreditCardCard({
                 {card.payments.map((p) => {
                   const statement = card.statements.find((s) => s.id === p.statementId);
                   return (
-                    <li key={p.id} className="py-1 flex items-center justify-between gap-2 flex-wrap">
+                    <li
+                      key={p.id}
+                      className="row-hover row-hover-edge py-1 px-2 -mx-2 flex items-center justify-between gap-2 flex-wrap"
+                    >
                       <div className="flex items-center gap-2 flex-wrap">
                         <span>{p.date.slice(0, 10)}</span>
                         {statement && (

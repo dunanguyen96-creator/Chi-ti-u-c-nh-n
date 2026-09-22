@@ -171,8 +171,8 @@ export default function BaoCaoPage() {
               </thead>
               <tbody>
                 {CATEGORIES.map((category) => (
-                  <tr key={category} className="border-b border-black/5 dark:border-white/10">
-                    <td className="p-2">{category}</td>
+                  <tr key={category} className="row-hover border-b border-black/5 dark:border-white/10">
+                    <td className="row-hover-edge p-2">{category}</td>
                     <td className="p-2 text-right tabular-nums">
                       {tableTotalsByCategory.get(category)
                         ? formatVnd(tableTotalsByCategory.get(category)!)
@@ -221,8 +221,8 @@ export default function BaoCaoPage() {
               </thead>
               <tbody>
                 {PAYMENT_CARDS.map((card) => (
-                  <tr key={card} className="border-b border-black/5 dark:border-white/10">
-                    <td className="p-2 whitespace-nowrap">{card}</td>
+                  <tr key={card} className="row-hover border-b border-black/5 dark:border-white/10">
+                    <td className="row-hover-edge p-2 whitespace-nowrap">{card}</td>
                     {paymentMonths.map((m) => {
                       const amount = paymentTotals.get(card)?.get(m) ?? 0;
                       return (

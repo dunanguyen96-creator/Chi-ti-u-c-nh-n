@@ -56,8 +56,8 @@ function TransactionRow({
     "w-full rounded border border-transparent hover:border-black/15 focus:border-[var(--accent)] dark:hover:border-white/20 bg-transparent px-1.5 py-1 text-sm outline-none";
 
   return (
-    <tr className="border-b border-black/5 dark:border-white/10 align-top">
-      <td className="p-1">
+    <tr className="row-hover border-b border-black/5 dark:border-white/10 align-top">
+      <td className="row-hover-edge p-1">
         <input
           type="date"
           value={date}

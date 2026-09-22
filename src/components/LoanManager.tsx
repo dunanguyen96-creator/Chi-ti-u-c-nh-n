@@ -85,8 +85,8 @@ export default function LoanManager({
           </thead>
           <tbody>
             {loans.map((l) => (
-              <tr key={l.id} className="border-b border-black/5 dark:border-white/10">
-                <td className="p-2 whitespace-nowrap">{l.description}</td>
+              <tr key={l.id} className="row-hover border-b border-black/5 dark:border-white/10">
+                <td className="row-hover-edge p-2 whitespace-nowrap">{l.description}</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.loanDate.slice(0, 10)}</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.termMonths} tháng</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.interestRate}%</td>

@@ -46,7 +46,10 @@ export default function CategoryBreakdown({
   return (
     <ul className="flex flex-col gap-2.5">
       {rows.map(([category, amount]) => (
-        <li key={category} className="flex flex-col gap-1">
+        <li
+          key={category}
+          className="row-hover row-hover-edge flex flex-col gap-1 py-1 px-2 -mx-2 rounded-md"
+        >
           <div className="flex justify-between text-sm gap-2">
             <span className="truncate" title={category}>
               {category}

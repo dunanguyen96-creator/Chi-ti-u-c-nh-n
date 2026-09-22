@@ -19,7 +19,7 @@ export default function NavBar() {
     <header className="border-b border-[var(--card-border)] sticky top-0 z-10 bg-[var(--background)]/90 backdrop-blur">
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-6 flex-wrap">
         <span className="font-semibold text-lg shrink-0 flex items-center gap-1.5">
-          <span aria-hidden>💰</span> Chi tiêu cá nhân
+          <span aria-hidden>💰</span> Quản lý chi tiêu
         </span>
         <nav className="flex gap-1 flex-wrap">
           {LINKS.map(({ href, label, Icon }) => {

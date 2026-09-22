@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chi tiêu cá nhân",
+  title: "Quản lý chi tiêu",
   description: "Ghi chú chi tiêu và theo dõi báo cáo cá nhân",
 };
 

@@ -32,6 +32,13 @@ export interface CardBaseline {
   amount: number;
 }
 
+export interface CardPaymentBaseline {
+  id: string;
+  month: string;
+  card: string;
+  amount: number;
+}
+
 export interface CardStatement {
   id: string;
   cardId: string;

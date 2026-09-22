@@ -61,6 +61,17 @@ model CardBaseline {
   @@unique([month, card])
 }
 
+model CardPaymentBaseline {
+  id        String   @id @default(cuid())
+  month     String
+  card      String
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([month, card])
+}
+
 model CreditCard {
   id         String          @id @default(cuid())
   name       String          @unique

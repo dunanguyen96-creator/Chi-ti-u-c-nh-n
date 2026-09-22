@@ -28,7 +28,7 @@ export default function LiveClock({ className = "" }: { className?: string }) {
   if (!now) return null;
 
   return (
-    <span className={`text-xs sm:text-sm text-foreground/60 tabular-nums shrink-0 ${className}`}>
+    <span className={`text-[11px] sm:text-xs text-[var(--muted-fg)] tabular-nums shrink-0 ${className}`}>
       {formatNow(now)}
     </span>
   );

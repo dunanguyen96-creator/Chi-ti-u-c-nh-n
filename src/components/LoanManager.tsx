@@ -26,6 +26,7 @@ export default function LoanManager({
   const [termMonths, setTermMonths] = useState("");
   const [interestRate, setInterestRate] = useState("");
   const [monthlyPayment, setMonthlyPayment] = useState("");
+  const [paymentDay, setPaymentDay] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -42,6 +43,7 @@ export default function LoanManager({
           termMonths: Number(termMonths),
           interestRate: Number(interestRate),
           monthlyPayment: Number(monthlyPayment),
+          paymentDay: paymentDay ? Number(paymentDay) : null,
         }),
       });
       if (res.ok) {
@@ -51,6 +53,7 @@ export default function LoanManager({
         setTermMonths("");
         setInterestRate("");
         setMonthlyPayment("");
+        setPaymentDay("");
       }
     } finally {
       setSubmitting(false);
@@ -74,6 +77,7 @@ export default function LoanManager({
               <th className="p-2 font-medium text-right">Ngày vay</th>
               <th className="p-2 font-medium text-right">Kỳ hạn</th>
               <th className="p-2 font-medium text-right">Lãi suất</th>
+              <th className="p-2 font-medium text-right">Ngày TT hàng tháng</th>
               <th className="p-2 font-medium text-right">Tổng trả hàng tháng</th>
               <th className="p-2"></th>
             </tr>
@@ -85,6 +89,9 @@ export default function LoanManager({
                 <td className="p-2 text-right whitespace-nowrap">{formatDateDMY(l.loanDate)}</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.termMonths} tháng</td>
                 <td className="p-2 text-right whitespace-nowrap">{l.interestRate}%</td>
+                <td className="p-2 text-right whitespace-nowrap">
+                  {l.paymentDay ? `Ngày ${l.paymentDay}` : "–"}
+                </td>
                 <td className="p-2 text-right tabular-nums font-medium whitespace-nowrap">
                   {formatVnd(l.monthlyPayment)}
                 </td>
@@ -141,6 +148,18 @@ export default function LoanManager({
             onChange={(e) => setInterestRate(e.target.value)}
             placeholder="0"
             className={`${inputClass} w-20`}
+          />
+        </label>
+        <label className="flex flex-col gap-0.5 text-xs text-foreground/60">
+          Ngày TT hàng tháng
+          <input
+            type="number"
+            min={1}
+            max={28}
+            value={paymentDay}
+            onChange={(e) => setPaymentDay(e.target.value)}
+            placeholder="VD: 15"
+            className={`${inputClass} w-24`}
           />
         </label>
         <label className="flex flex-col gap-0.5 text-xs text-foreground/60">

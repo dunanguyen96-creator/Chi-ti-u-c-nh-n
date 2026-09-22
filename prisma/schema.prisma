@@ -92,6 +92,9 @@ model Loan {
   termMonths     Int
   interestRate   Float
   monthlyPayment Int
+  // Day of month (1-28, to stay valid every month) the payment is due —
+  // used to compute the next upcoming due date for the reminder popup.
+  paymentDay     Int?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }

@@ -10,7 +10,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { description, loanDate, termMonths, interestRate, monthlyPayment } = body;
+  const { description, loanDate, termMonths, interestRate, monthlyPayment, paymentDay } = body;
 
   if (
     !description ||
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
       termMonths: Math.round(Number(termMonths)),
       interestRate: Number(interestRate),
       monthlyPayment: Math.round(Number(monthlyPayment)),
+      paymentDay: paymentDay ? Math.round(Number(paymentDay)) : null,
     },
   });
 

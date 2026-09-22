@@ -57,32 +57,14 @@ function TransactionRow({
 
   return (
     <tr className="row-hover border-b border-black/5 dark:border-white/10 align-top">
-      <td className="row-hover-edge p-1">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => field(setDate, "date")(e.target.value)}
-          className={inputClass}
+      <td className="row-hover-edge p-1 w-28">
+        <MoneyInput
+          value={amount}
+          onChange={field(setAmount, "amount")}
+          className={`${inputClass} text-right font-medium`}
         />
       </td>
-      <td className="p-1">
-        <input
-          type="month"
-          value={recordMonth}
-          onChange={(e) => field(setRecordMonth, "recordMonth")(e.target.value)}
-          title="Tháng tính vào báo cáo/thẻ"
-          className={inputClass}
-        />
-      </td>
-      <td className="p-1 min-w-[140px]">
-        <input
-          type="text"
-          value={description}
-          onChange={(e) => field(setDescription, "description")(e.target.value)}
-          className={inputClass}
-        />
-      </td>
-      <td className="p-1 min-w-[200px]">
+      <td className="p-1 min-w-[160px]">
         <select
           value={category}
           onChange={(e) => field(setCategory, "category")(e.target.value)}
@@ -94,6 +76,31 @@ function TransactionRow({
             </option>
           ))}
         </select>
+      </td>
+      <td className="p-1 min-w-[90px]">
+        <input
+          type="text"
+          value={description}
+          onChange={(e) => field(setDescription, "description")(e.target.value)}
+          className={inputClass}
+        />
+      </td>
+      <td className="p-1">
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => field(setDate, "date")(e.target.value)}
+          className={`${inputClass} w-[110px]`}
+        />
+      </td>
+      <td className="p-1">
+        <input
+          type="month"
+          value={recordMonth}
+          onChange={(e) => field(setRecordMonth, "recordMonth")(e.target.value)}
+          title="Tháng tính vào báo cáo/thẻ"
+          className={`${inputClass} w-[90px]`}
+        />
       </td>
       <td className="p-1">
         <select
@@ -109,14 +116,7 @@ function TransactionRow({
           ))}
         </select>
       </td>
-      <td className="p-1 text-right">
-        <MoneyInput
-          value={amount}
-          onChange={field(setAmount, "amount")}
-          className={`${inputClass} text-right`}
-        />
-      </td>
-      <td className="p-1 min-w-[120px]">
+      <td className="p-1 min-w-[80px]">
         <input
           type="text"
           value={note}
@@ -163,12 +163,12 @@ export default function TransactionTable({
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="text-left text-foreground/60 border-b border-black/10 dark:border-white/10">
+            <th className="p-1 font-medium text-right">Số tiền</th>
+            <th className="p-1 font-medium">Hạng mục</th>
+            <th className="p-1 font-medium">Chi tiêu</th>
             <th className="p-1 font-medium">Ngày</th>
             <th className="p-1 font-medium">Tháng ghi nhận</th>
-            <th className="p-1 font-medium">Chi tiêu</th>
-            <th className="p-1 font-medium">Hạng mục</th>
             <th className="p-1 font-medium">Thẻ</th>
-            <th className="p-1 font-medium text-right">Số tiền</th>
             <th className="p-1 font-medium">Ghi chú</th>
             <th className="p-1 font-medium"></th>
           </tr>
@@ -179,12 +179,11 @@ export default function TransactionTable({
           ))}
         </tbody>
         <tfoot>
-          <tr className="font-medium border-t border-black/10 dark:border-white/10">
-            <td className="p-1.5" colSpan={5}>
+          <tr className="font-bold border-t border-black/10 dark:border-white/10">
+            <td className="p-1.5 text-right whitespace-nowrap">{formatVnd(total)}</td>
+            <td className="p-1.5 whitespace-nowrap" colSpan={7}>
               Tổng ({transactions.length} khoản chi)
             </td>
-            <td className="p-1.5 text-right">{formatVnd(total)}</td>
-            <td colSpan={2}></td>
           </tr>
         </tfoot>
       </table>

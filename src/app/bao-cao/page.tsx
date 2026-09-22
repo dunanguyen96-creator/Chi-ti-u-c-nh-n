@@ -80,14 +80,14 @@ export default function BaoCaoPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 flex flex-col gap-6 w-full">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-semibold">Báo cáo</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Báo cáo</h1>
         <label className="flex items-center gap-2 text-sm">
           Tháng
           <input
             type="month"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           />
           <span className="text-foreground/60">({formatMonthLabel(month)})</span>
         </label>
@@ -97,19 +97,19 @@ export default function BaoCaoPage() {
         <p className="text-sm text-foreground/50 py-6 text-center">Đang tải...</p>
       ) : (
         <>
-          <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
+          <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm shadow-black/[0.04] dark:shadow-black/30">
             <h2 className="font-medium mb-3">
               Tỉ lệ chi theo hạng mục — {formatMonthLabel(month)}
             </h2>
             <CategoryDonutChart totalsByCategory={totalsByCategory} />
           </div>
 
-          <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
+          <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm shadow-black/[0.04] dark:shadow-black/30">
             <h2 className="font-medium mb-3">Xu hướng chi theo tháng</h2>
             <CategoryTrendChart months={trendMonths} dataByMonth={trendData} />
           </div>
 
-          <div className="rounded-lg border border-black/10 dark:border-white/10 overflow-hidden">
+          <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] shadow-sm shadow-black/[0.04] dark:shadow-black/30 overflow-hidden">
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="text-left text-foreground/60 border-b border-black/10 dark:border-white/10">

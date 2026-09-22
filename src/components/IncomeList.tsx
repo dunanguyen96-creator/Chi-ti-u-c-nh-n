@@ -50,7 +50,7 @@ export default function IncomeList({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-2xl font-semibold text-emerald-600">{formatVnd(total)}</span>
+      <span className="text-3xl font-bold text-emerald-600">{formatVnd(total)}</span>
 
       {incomes.length > 0 && (
         <ul className="flex flex-col divide-y divide-black/5 dark:divide-white/10 text-sm">
@@ -78,17 +78,17 @@ export default function IncomeList({
           placeholder="Loại thu nhập (VD: Lương)"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="flex-1 min-w-[120px] rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1 text-sm"
+          className="flex-1 min-w-[120px] rounded-lg border border-[var(--card-border)] bg-transparent px-2 py-1 text-sm"
         />
         <MoneyInput
           value={amount}
           onChange={setAmount}
-          className="w-28 rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1 text-sm text-right"
+          className="w-28 rounded-lg border border-[var(--card-border)] bg-transparent px-2 py-1 text-sm text-right"
         />
         <button
           type="submit"
           disabled={submitting || !amount}
-          className="rounded-md bg-emerald-600 text-white px-3 py-1 text-sm font-medium hover:bg-emerald-700 disabled:opacity-50"
+          className="rounded-lg bg-[var(--accent)] text-white px-3 py-1 text-sm font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50"
         >
           + Thêm khoản thu
         </button>

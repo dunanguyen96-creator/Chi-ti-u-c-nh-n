@@ -139,7 +139,7 @@ export default function TransactionForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-lg border border-black/10 dark:border-white/10 p-4 bg-black/[0.02] dark:bg-white/[0.03]"
+      className="rounded-xl border border-[var(--card-border)] p-4 bg-[var(--accent-soft)]/40"
     >
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-medium">Thêm khoản chi</h2>
@@ -157,7 +157,7 @@ export default function TransactionForm({
             required
             value={draft.date}
             onChange={(e) => updateDate(e.target.value)}
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -168,7 +168,7 @@ export default function TransactionForm({
             value={draft.recordMonth}
             onChange={(e) => updateRecordMonth(e.target.value)}
             title="Tháng tính vào báo cáo/thẻ (VD chi tháng 9 nhưng ghi nhận tháng 10)"
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm md:col-span-2">
@@ -179,7 +179,7 @@ export default function TransactionForm({
             placeholder="VD: Bún cá"
             value={draft.description}
             onChange={(e) => update("description", e.target.value)}
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -187,7 +187,7 @@ export default function TransactionForm({
           <MoneyInput
             value={draft.amount}
             onChange={(v) => update("amount", v)}
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -195,7 +195,7 @@ export default function TransactionForm({
           <select
             value={draft.category}
             onChange={(e) => update("category", e.target.value)}
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           >
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>
@@ -209,7 +209,7 @@ export default function TransactionForm({
           <select
             value={draft.card}
             onChange={(e) => update("card", e.target.value)}
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           >
             <option value="">Cash</option>
             {CARDS.map((c) => (
@@ -226,7 +226,7 @@ export default function TransactionForm({
             placeholder="Không bắt buộc"
             value={draft.note}
             onChange={(e) => update("note", e.target.value)}
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           />
         </label>
       </div>
@@ -234,7 +234,7 @@ export default function TransactionForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-md bg-emerald-600 text-white px-4 py-1.5 text-sm font-medium hover:bg-emerald-700 disabled:opacity-50"
+          className="rounded-lg bg-[var(--accent)] text-white px-4 py-1.5 text-sm font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50"
         >
           {submitting ? "Đang lưu..." : "+ Thêm khoản chi"}
         </button>

@@ -44,21 +44,21 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 flex flex-col gap-6 w-full">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-semibold">Tổng quan</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Tổng quan</h1>
         <label className="flex items-center gap-2 text-sm">
           Tháng
           <input
             type="month"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
-            className="rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5"
+            className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
           />
           <span className="text-foreground/60">({formatMonthLabel(month)})</span>
         </label>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-lg border border-black/10 dark:border-white/10 p-4 flex flex-col gap-2 sm:col-span-1">
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm shadow-black/[0.04] dark:shadow-black/30 flex flex-col gap-2 sm:col-span-1">
           <span className="text-sm text-foreground/60">Thu nhập</span>
           <IncomeList
             month={month}
@@ -67,16 +67,16 @@ export default function DashboardPage() {
             onDeleted={(id) => setIncomes((prev) => prev.filter((i) => i.id !== id))}
           />
         </div>
-        <div className="rounded-lg border border-black/10 dark:border-white/10 p-4 flex flex-col gap-1">
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm shadow-black/[0.04] dark:shadow-black/30 flex flex-col gap-1">
           <span className="text-sm text-foreground/60">Tổng chi</span>
-          <span className="text-2xl font-semibold text-rose-600">
+          <span className="text-3xl font-bold text-rose-600">
             {formatVnd(totalExpense)}
           </span>
         </div>
-        <div className="rounded-lg border border-black/10 dark:border-white/10 p-4 flex flex-col gap-1">
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm shadow-black/[0.04] dark:shadow-black/30 flex flex-col gap-1">
           <span className="text-sm text-foreground/60">Chênh lệch</span>
           <span
-            className={`text-2xl font-semibold ${
+            className={`text-3xl font-bold ${
               balance >= 0 ? "text-emerald-600" : "text-rose-600"
             }`}
           >
@@ -86,7 +86,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm shadow-black/[0.04] dark:shadow-black/30">
           <h2 className="font-medium mb-3">Chi tiêu theo hạng mục</h2>
           {loading ? (
             <p className="text-sm text-foreground/50 py-6 text-center">Đang tải...</p>
@@ -95,12 +95,12 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm shadow-black/[0.04] dark:shadow-black/30">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-medium">Khoản chi gần đây</h2>
             <Link
               href="/giao-dich"
-              className="text-sm text-emerald-600 hover:underline"
+              className="text-sm text-[var(--accent)] hover:underline"
             >
               Xem tất cả →
             </Link>

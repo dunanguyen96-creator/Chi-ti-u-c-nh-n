@@ -53,7 +53,7 @@ function TransactionRow({
   }
 
   const inputClass =
-    "w-full rounded border border-transparent hover:border-black/15 focus:border-emerald-500 dark:hover:border-white/20 bg-transparent px-1.5 py-1 text-sm outline-none";
+    "w-full rounded border border-transparent hover:border-black/15 focus:border-[var(--accent)] dark:hover:border-white/20 bg-transparent px-1.5 py-1 text-sm outline-none";
 
   return (
     <tr className="border-b border-black/5 dark:border-white/10 align-top">

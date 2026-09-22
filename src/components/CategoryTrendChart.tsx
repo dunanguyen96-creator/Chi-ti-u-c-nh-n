@@ -183,7 +183,7 @@ export default function CategoryTrendChart({
       </svg>
 
       {hoverMonth && (
-        <div className="text-xs rounded-md border border-black/10 dark:border-white/10 p-2 -mt-1 flex flex-col gap-1">
+        <div className="text-xs rounded-lg border border-[var(--card-border)] bg-[var(--accent-soft)]/40 p-2 -mt-1 flex flex-col gap-1">
           <span className="font-medium text-foreground/80">{formatMonthLabel(hoverMonth)}</span>
           {visibleCategories.map((category) => (
             <div key={category} className="flex items-center justify-between gap-2">
@@ -215,7 +215,7 @@ export default function CategoryTrendChart({
                 type="checkbox"
                 checked={checked}
                 onChange={() => toggle(category)}
-                className="accent-emerald-600"
+                className="accent-[var(--accent)]"
               />
               <span
                 className="w-3 h-0.5 shrink-0"

@@ -13,7 +13,7 @@ function todayStr() {
 }
 
 const inputClass =
-  "rounded-md border border-black/15 dark:border-white/15 bg-transparent px-2 py-1.5 text-sm";
+  "rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5 text-sm";
 
 function StatementRow({
   cardId,
@@ -163,7 +163,7 @@ export default function CreditCardCard({
   }
 
   return (
-    <div className="rounded-lg border border-black/10 dark:border-white/10 overflow-hidden flex flex-col">
+    <div className="rounded-xl border border-[var(--card-border)] overflow-hidden flex flex-col shadow-sm shadow-black/[0.04] dark:shadow-black/30">
       <div className={`${theme.header} px-4 py-3 flex items-center justify-between gap-3 flex-wrap`}>
         <input
           value={name}
@@ -238,7 +238,7 @@ export default function CreditCardCard({
               <button
                 type="submit"
                 disabled={stSubmitting || !stBalance}
-                className="rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-emerald-700 disabled:opacity-50 self-end"
+                className="rounded-lg bg-[var(--accent)] text-white px-3 py-1.5 text-xs font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50 self-end"
               >
                 + Thêm sao kê
               </button>
@@ -280,7 +280,7 @@ export default function CreditCardCard({
               <button
                 type="submit"
                 disabled={pSubmitting || !pAmount}
-                className="rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-medium hover:bg-emerald-700 disabled:opacity-50"
+                className="rounded-lg bg-[var(--accent)] text-white px-3 py-1.5 text-xs font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50"
               >
                 + Thêm lịch sử thanh toán
               </button>

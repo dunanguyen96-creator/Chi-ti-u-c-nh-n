@@ -2,26 +2,30 @@
 
 import { useCallback, useEffect, useState } from "react";
 import CreditCardCard from "@/components/CreditCardCard";
+import InstallmentManager from "@/components/InstallmentManager";
 import { monthKeyFromDate, formatMonthLabel } from "@/lib/constants";
-import type { CreditCard, Transaction, CardBaseline } from "@/lib/types";
+import type { CreditCard, Transaction, CardBaseline, Installment } from "@/lib/types";
 
 export default function TheTinDungPage() {
   const [month, setMonth] = useState(() => monthKeyFromDate(new Date()));
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [baselines, setBaselines] = useState<CardBaseline[]>([]);
+  const [installments, setInstallments] = useState<Installment[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (m: string) => {
     setLoading(true);
-    const [cardsRes, txRes, baselineRes] = await Promise.all([
+    const [cardsRes, txRes, baselineRes, installmentRes] = await Promise.all([
       fetch("/api/cards"),
       fetch(`/api/transactions?month=${m}`),
       fetch(`/api/card-baselines?month=${m}`),
+      fetch("/api/installments"),
     ]);
     setCards((await cardsRes.json()) as CreditCard[]);
     setTransactions((await txRes.json()) as Transaction[]);
     setBaselines((await baselineRes.json()) as CardBaseline[]);
+    setInstallments((await installmentRes.json()) as Installment[]);
     setLoading(false);
   }, []);
 
@@ -38,12 +42,32 @@ export default function TheTinDungPage() {
     return baseline + txTotal;
   }
 
+  // Installments active this month (tháng bắt đầu <= month <= tháng kết
+  // thúc — plain string compare works since months are "YYYY-MM").
+  function installmentForCard(cardName: string) {
+    return installments
+      .filter((i) => i.card === cardName && i.startMonth <= month && month <= i.endMonth)
+      .reduce((sum, i) => sum + i.monthlyAmount, 0);
+  }
+
+  function expectedBalanceForCard(cardName: string) {
+    return totalForCard(cardName) + installmentForCard(cardName);
+  }
+
   function handleUpdated(updated: CreditCard) {
     setCards((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
   }
 
   function handleDeleted(id: string) {
     setCards((prev) => prev.filter((c) => c.id !== id));
+  }
+
+  function handleInstallmentCreated(installment: Installment) {
+    setInstallments((prev) => [installment, ...prev]);
+  }
+
+  function handleInstallmentDeleted(id: string) {
+    setInstallments((prev) => prev.filter((i) => i.id !== id));
   }
 
   return (
@@ -65,17 +89,26 @@ export default function TheTinDungPage() {
       {loading ? (
         <p className="text-sm text-foreground/50 py-6 text-center">Đang tải...</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {cards.map((c) => (
-            <CreditCardCard
-              key={c.id}
-              card={c}
-              monthTotal={totalForCard(c.name)}
-              onUpdated={handleUpdated}
-              onDeleted={handleDeleted}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {cards.map((c) => (
+              <CreditCardCard
+                key={c.id}
+                card={c}
+                monthTotal={totalForCard(c.name)}
+                expectedBalance={expectedBalanceForCard(c.name)}
+                onUpdated={handleUpdated}
+                onDeleted={handleDeleted}
+              />
+            ))}
+          </div>
+
+          <InstallmentManager
+            installments={installments}
+            onCreated={handleInstallmentCreated}
+            onDeleted={handleInstallmentDeleted}
+          />
+        </>
       )}
     </div>
   );

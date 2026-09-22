@@ -76,11 +76,13 @@ function StatementRow({
 export default function CreditCardCard({
   card,
   monthTotal,
+  expectedBalance,
   onUpdated,
   onDeleted,
 }: {
   card: CreditCard;
   monthTotal: number;
+  expectedBalance: number;
   onUpdated: (c: CreditCard) => void;
   onDeleted: (id: string) => void;
 }) {
@@ -228,7 +230,7 @@ export default function CreditCardCard({
 
         <div className="rounded-md bg-black/[0.03] dark:bg-white/[0.05] px-3 py-2 flex items-center justify-between">
           <span className="text-sm text-foreground/60">Dư nợ dự kiến</span>
-          <span className="font-bold">{formatVnd(monthTotal)}</span>
+          <span className="font-bold">{formatVnd(expectedBalance)}</span>
         </div>
 
         <details className="text-sm" open>

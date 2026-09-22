@@ -39,6 +39,15 @@ export interface CardPaymentBaseline {
   amount: number;
 }
 
+export interface Installment {
+  id: string;
+  card: string;
+  totalAmount: number;
+  startMonth: string;
+  endMonth: string;
+  monthlyAmount: number;
+}
+
 export interface CardStatement {
   id: string;
   cardId: string;

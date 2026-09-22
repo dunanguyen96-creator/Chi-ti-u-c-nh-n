@@ -3,22 +3,25 @@
 import { useCallback, useEffect, useState } from "react";
 import CreditCardCard from "@/components/CreditCardCard";
 import { monthKeyFromDate, formatMonthLabel } from "@/lib/constants";
-import type { CreditCard, Transaction } from "@/lib/types";
+import type { CreditCard, Transaction, CardBaseline } from "@/lib/types";
 
 export default function TheTinDungPage() {
   const [month, setMonth] = useState(() => monthKeyFromDate(new Date()));
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [baselines, setBaselines] = useState<CardBaseline[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (m: string) => {
     setLoading(true);
-    const [cardsRes, txRes] = await Promise.all([
+    const [cardsRes, txRes, baselineRes] = await Promise.all([
       fetch("/api/cards"),
       fetch(`/api/transactions?month=${m}`),
+      fetch(`/api/card-baselines?month=${m}`),
     ]);
     setCards((await cardsRes.json()) as CreditCard[]);
     setTransactions((await txRes.json()) as Transaction[]);
+    setBaselines((await baselineRes.json()) as CardBaseline[]);
     setLoading(false);
   }, []);
 
@@ -28,9 +31,11 @@ export default function TheTinDungPage() {
   }, [month, load]);
 
   function totalForCard(cardName: string) {
-    return transactions
+    const baseline = baselines.find((b) => b.card === cardName)?.amount ?? 0;
+    const txTotal = transactions
       .filter((t) => t.card === cardName)
       .reduce((sum, t) => sum + t.amount, 0);
+    return baseline + txTotal;
   }
 
   function handleUpdated(updated: CreditCard) {

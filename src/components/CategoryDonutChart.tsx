@@ -76,6 +76,14 @@ export default function CategoryDonutChart({
 
   const activeSlice = active !== null ? arcs[active] : null;
 
+  // The pie itself stays in the palette's fixed, validated adjacent-color
+  // order — but the legend list reads better ranked highest to lowest, so
+  // it's rendered in a separately sorted order while still indexing back
+  // into `arcs` (keeps hover/focus sync with the correct pie slice).
+  const legendOrder = arcs
+    .map((_, i) => i)
+    .sort((a, b) => arcs[b].amount - arcs[a].amount);
+
   return (
     <div className="flex flex-col gap-3">
       <label className="flex items-center gap-2 text-sm self-start">
@@ -135,28 +143,31 @@ export default function CategoryDonutChart({
           </div>
 
           <ul className="flex flex-col gap-1.5 text-sm w-full">
-            {arcs.map((s, i) => (
-              <li
-                key={s.category}
-                className={`flex items-center justify-between gap-2 rounded px-1.5 py-1 cursor-pointer border-l-2 transition-colors ${
-                  active === i ? "bg-[var(--accent-soft)] border-l-[var(--accent)]" : "border-l-transparent"
-                }`}
-                onMouseEnter={() => setActive(i)}
-                onMouseLeave={() => setActive(null)}
-                onClick={() => setActive(active === i ? null : i)}
-              >
-                <span className="flex items-center gap-2 min-w-0">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: s.color }}
-                  />
-                  <span className="truncate text-foreground/80">{s.category}</span>
-                </span>
-                <span className="tabular-nums text-foreground/70 shrink-0">
-                  {formatVnd(s.amount)} · {s.pct.toFixed(0)}%
-                </span>
-              </li>
-            ))}
+            {legendOrder.map((i) => {
+              const s = arcs[i];
+              return (
+                <li
+                  key={s.category}
+                  className={`flex items-center justify-between gap-2 rounded px-1.5 py-1 cursor-pointer border-l-2 transition-colors ${
+                    active === i ? "bg-[var(--accent-soft)] border-l-[var(--accent)]" : "border-l-transparent"
+                  }`}
+                  onMouseEnter={() => setActive(i)}
+                  onMouseLeave={() => setActive(null)}
+                  onClick={() => setActive(active === i ? null : i)}
+                >
+                  <span className="flex items-center gap-2 min-w-0">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: s.color }}
+                    />
+                    <span className="truncate text-foreground/80">{s.category}</span>
+                  </span>
+                  <span className="tabular-nums text-foreground/70 shrink-0">
+                    {formatVnd(s.amount)} · {s.pct.toFixed(0)}%
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

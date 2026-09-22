@@ -79,6 +79,16 @@ export default function BaoCaoPage() {
     return categoryTotals(monthTx, monthBaselines);
   }, [allTransactions, allBaselines, tableMonth]);
 
+  // Ranked highest to lowest for readability — the fixed CATEGORIES order
+  // only matters for the donut's validated slice colors, not this table.
+  const rankedCategories = useMemo(
+    () =>
+      [...CATEGORIES].sort(
+        (a, b) => (tableTotalsByCategory.get(b) ?? 0) - (tableTotalsByCategory.get(a) ?? 0),
+      ),
+    [tableTotalsByCategory],
+  );
+
   const tableTotalExpense = [...tableTotalsByCategory.values()].reduce((sum, v) => sum + v, 0);
   const tableTotalIncome = incomeByMonth.get(tableMonth) ?? 0;
   const tableBalance = tableTotalIncome - tableTotalExpense;
@@ -170,7 +180,7 @@ export default function BaoCaoPage() {
                 </tr>
               </thead>
               <tbody>
-                {CATEGORIES.map((category) => (
+                {rankedCategories.map((category) => (
                   <tr key={category} className="row-hover border-b border-black/5 dark:border-white/10">
                     <td className="row-hover-edge p-2">{category}</td>
                     <td className="p-2 text-right tabular-nums">

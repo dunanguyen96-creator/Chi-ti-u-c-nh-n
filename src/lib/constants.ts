@@ -26,7 +26,7 @@ export const CATEGORY_ICON: Record<Category, string> = {
   "Học": "📚",
   "Trả nợ/ đáo thẻ": "💳",
   "Mèo": "🐱",
-  "Son": "💄",
+  "Son": "👦",
   "Khác": "🔖",
 };
 

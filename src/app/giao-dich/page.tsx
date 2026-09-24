@@ -29,6 +29,8 @@ export default function GiaoDichPage() {
     // Newly entered expenses always land at the very top, regardless of date.
     if (t.recordMonth === month) {
       setTransactions((prev) => [t, ...prev]);
+      // Clear an active filter if it would otherwise hide the item just added.
+      setCategoryFilter((prev) => (prev && prev !== t.category ? "" : prev));
     }
   }
 

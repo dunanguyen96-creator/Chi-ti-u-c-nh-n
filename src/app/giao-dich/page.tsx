@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import TransactionForm from "@/components/TransactionForm";
 import TransactionTable from "@/components/TransactionTable";
-import { CATEGORIES, CATEGORY_ICON, monthKeyFromDate, formatMonthLabel } from "@/lib/constants";
+import { CATEGORIES, CATEGORY_ICON, formatMonthLabel } from "@/lib/constants";
 import type { Transaction } from "@/lib/types";
 
 export default function GiaoDichPage() {
-  const [month, setMonth] = useState(() => monthKeyFromDate(new Date()));
+  // Empty string = no month filter ("Tất cả") — the list shows every
+  // expense, newest-entered first, until a specific month is picked.
+  const [month, setMonth] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categoryFilter, setCategoryFilter] = useState("");
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ export default function GiaoDichPage() {
 
   function handleAdded(t: Transaction) {
     // Newly entered expenses always land at the very top, regardless of date.
-    if (t.recordMonth === month) {
+    if (!month || t.recordMonth === month) {
       setTransactions((prev) => [t, ...prev]);
       // Clear an active filter if it would otherwise hide the item just added.
       setCategoryFilter((prev) => (prev && prev !== t.category ? "" : prev));
@@ -62,7 +64,18 @@ export default function GiaoDichPage() {
                 onChange={(e) => setMonth(e.target.value)}
                 className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5"
               />
-              <span className="text-foreground/60">({formatMonthLabel(month)})</span>
+              <span className="text-foreground/60">
+                {month ? `(${formatMonthLabel(month)})` : "(Tất cả)"}
+              </span>
+              {month && (
+                <button
+                  type="button"
+                  onClick={() => setMonth("")}
+                  className="text-xs text-[var(--accent)] hover:underline"
+                >
+                  Bỏ lọc
+                </button>
+              )}
             </label>
             <label className="flex items-center gap-2 text-sm">
               Lọc theo hạng mục

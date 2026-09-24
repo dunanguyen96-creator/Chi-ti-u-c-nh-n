@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CATEGORIES, CARDS, CATEGORY_ICON, formatVnd, formatMonthShort } from "@/lib/constants";
 import { useDebouncedSave } from "@/lib/useDebouncedSave";
 import SaveStatusBadge from "@/components/SaveStatusBadge";
@@ -20,17 +20,44 @@ function CompactMonthInput({
   onChange: (v: string) => void;
   title?: string;
 }) {
+  const ref = useRef<HTMLInputElement>(null);
+
+  // A native month input only opens its picker when the click lands on its
+  // internal calendar icon, not the digits — so open it explicitly instead
+  // of relying on where within the compact label the click happened.
+  function openPicker() {
+    const el = ref.current;
+    if (!el) return;
+    el.focus();
+    if (typeof el.showPicker === "function") {
+      try {
+        el.showPicker();
+      } catch {
+        // ignore (e.g. not called from a user gesture)
+      }
+    }
+  }
+
   return (
     <div className={compactTriggerClass}>
-      <span className="pointer-events-none select-none text-sm tabular-nums">
-        {formatMonthShort(value)}
-      </span>
+      <button
+        type="button"
+        title={title}
+        onClick={openPicker}
+        className="absolute inset-0 flex h-full w-full items-center justify-center cursor-pointer bg-transparent"
+      >
+        <span className="pointer-events-none select-none text-sm tabular-nums">
+          {formatMonthShort(value)}
+        </span>
+      </button>
       <input
+        ref={ref}
         type="month"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         title={title}
-        className={compactOverlayClass}
+        tabIndex={-1}
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-0"
       />
     </div>
   );

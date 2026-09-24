@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 import MoneyInput from "@/components/MoneyInput";
-import { formatVnd, formatDateDMY } from "@/lib/constants";
+import { formatVnd, formatDateDMY, todayStr } from "@/lib/constants";
 import type { Loan } from "@/lib/types";
 
 const inputClass =
   "rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-2 py-1.5 text-sm";
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export default function LoanManager({
   loans,

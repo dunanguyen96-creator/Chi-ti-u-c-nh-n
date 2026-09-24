@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
 
   const transactions = await prisma.transaction.findMany({
     where: month ? { recordMonth: month } : {},
-    orderBy: { date: "desc" },
+    orderBy: [{ date: "desc" }, { createdAt: "desc" }],
   });
   return NextResponse.json(transactions);
 }

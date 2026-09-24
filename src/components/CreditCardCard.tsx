@@ -4,13 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useDebouncedSave } from "@/lib/useDebouncedSave";
 import SaveStatusBadge from "@/components/SaveStatusBadge";
 import MoneyInput from "@/components/MoneyInput";
-import { formatVnd, formatDateDMY } from "@/lib/constants";
+import { formatVnd, formatDateDMY, todayStr } from "@/lib/constants";
 import { cardTheme } from "@/lib/cardThemes";
 import type { CreditCard, CardStatement, CardPayment } from "@/lib/types";
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 // Days from today to dateStr (negative when dateStr is in the past).
 function daysUntil(dateStr: string): number {

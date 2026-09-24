@@ -1,4 +1,4 @@
-import { CATEGORIES, formatVnd } from "@/lib/constants";
+import { CATEGORIES, CATEGORY_ICON, formatVnd } from "@/lib/constants";
 import { categoryTotals } from "@/lib/reportUtils";
 import type { Transaction, CategoryBaseline } from "@/lib/types";
 
@@ -51,8 +51,9 @@ export default function CategoryBreakdown({
           className="row-hover row-hover-edge flex flex-col gap-1 py-1 px-2 -mx-2 rounded-md"
         >
           <div className="flex justify-between text-sm gap-2">
-            <span className="truncate" title={category}>
-              {category}
+            <span className="flex items-center gap-1.5 truncate" title={category}>
+              <span aria-hidden>{CATEGORY_ICON[category as keyof typeof CATEGORY_ICON] ?? "🔖"}</span>
+              <span className="truncate">{category}</span>
             </span>
             <span className="shrink-0 tabular-nums text-foreground/70">
               {formatVnd(amount)}

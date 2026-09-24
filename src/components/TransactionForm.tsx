@@ -1,15 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CATEGORIES, CARDS, monthKeyFromDate } from "@/lib/constants";
+import { CATEGORIES, CARDS, monthKeyFromDate, todayStr, CATEGORY_ICON } from "@/lib/constants";
 import MoneyInput from "@/components/MoneyInput";
 import type { Transaction } from "@/lib/types";
 
 const DRAFT_KEY = "chi-tieu:draft-transaction";
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 interface Draft {
   date: string;
@@ -199,7 +195,7 @@ export default function TransactionForm({
           >
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {CATEGORY_ICON[c]} {c}
               </option>
             ))}
           </select>

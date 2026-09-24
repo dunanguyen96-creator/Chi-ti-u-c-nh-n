@@ -1,11 +1,68 @@
 "use client";
 
 import { useState } from "react";
-import { CATEGORIES, CARDS, formatVnd } from "@/lib/constants";
+import { CATEGORIES, CARDS, CATEGORY_ICON, formatVnd, formatMonthShort } from "@/lib/constants";
 import { useDebouncedSave } from "@/lib/useDebouncedSave";
 import SaveStatusBadge from "@/components/SaveStatusBadge";
 import MoneyInput from "@/components/MoneyInput";
 import type { Transaction } from "@/lib/types";
+
+const compactTriggerClass =
+  "relative inline-flex h-7 w-full items-center justify-center rounded border border-transparent hover:border-black/15 dark:hover:border-white/20";
+const compactOverlayClass = "absolute inset-0 h-full w-full cursor-pointer opacity-0";
+
+function CompactMonthInput({
+  value,
+  onChange,
+  title,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  title?: string;
+}) {
+  return (
+    <div className={compactTriggerClass}>
+      <span className="pointer-events-none select-none text-sm tabular-nums">
+        {formatMonthShort(value)}
+      </span>
+      <input
+        type="month"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        title={title}
+        className={compactOverlayClass}
+      />
+    </div>
+  );
+}
+
+function CompactCategorySelect({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className={`${compactTriggerClass} w-9`}>
+      <span className="pointer-events-none select-none text-base" title={value}>
+        {CATEGORY_ICON[value as keyof typeof CATEGORY_ICON] ?? "🔖"}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        title={value}
+        className={compactOverlayClass}
+      >
+        {CATEGORIES.map((c) => (
+          <option key={c} value={c}>
+            {CATEGORY_ICON[c]} {c}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 function TransactionRow({
   transaction,
@@ -57,27 +114,22 @@ function TransactionRow({
 
   return (
     <tr className="row-hover border-b border-black/5 dark:border-white/10 align-top">
-      <td className="row-hover-edge p-1 w-28">
-        <MoneyInput
-          value={amount}
-          onChange={field(setAmount, "amount")}
-          className={`${inputClass} text-right font-medium`}
+      <td className="row-hover-edge p-1">
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => field(setDate, "date")(e.target.value)}
+          className={`${inputClass} w-[104px]`}
         />
       </td>
-      <td className="p-1 min-w-[160px]">
-        <select
-          value={category}
-          onChange={(e) => field(setCategory, "category")(e.target.value)}
-          className={inputClass}
-        >
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
+      <td className="p-1 w-[74px]">
+        <CompactMonthInput
+          value={recordMonth}
+          onChange={field(setRecordMonth, "recordMonth")}
+          title="Tháng tính vào báo cáo/thẻ"
+        />
       </td>
-      <td className="p-1 min-w-[90px]">
+      <td className="p-1 min-w-[110px]">
         <input
           type="text"
           value={description}
@@ -85,24 +137,17 @@ function TransactionRow({
           className={inputClass}
         />
       </td>
-      <td className="p-1">
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => field(setDate, "date")(e.target.value)}
-          className={`${inputClass} w-[110px]`}
+      <td className="p-1 w-24">
+        <MoneyInput
+          value={amount}
+          onChange={field(setAmount, "amount")}
+          className={`${inputClass} text-right font-medium`}
         />
       </td>
-      <td className="p-1">
-        <input
-          type="month"
-          value={recordMonth}
-          onChange={(e) => field(setRecordMonth, "recordMonth")(e.target.value)}
-          title="Tháng tính vào báo cáo/thẻ"
-          className={`${inputClass} w-[90px]`}
-        />
+      <td className="p-1 text-center">
+        <CompactCategorySelect value={category} onChange={field(setCategory, "category")} />
       </td>
-      <td className="p-1">
+      <td className="p-1 min-w-[130px]">
         <select
           value={card}
           onChange={(e) => field(setCard, "card")(e.target.value)}
@@ -163,11 +208,11 @@ export default function TransactionTable({
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="text-left text-foreground/60 border-b border-black/10 dark:border-white/10">
-            <th className="p-1 font-medium text-right">Số tiền</th>
-            <th className="p-1 font-medium">Hạng mục</th>
-            <th className="p-1 font-medium">Chi tiêu</th>
             <th className="p-1 font-medium">Ngày</th>
             <th className="p-1 font-medium">Tháng ghi nhận</th>
+            <th className="p-1 font-medium">Chi tiêu</th>
+            <th className="p-1 font-medium text-right">Số tiền</th>
+            <th className="p-1 font-medium text-center">Hạng mục</th>
             <th className="p-1 font-medium">Thẻ</th>
             <th className="p-1 font-medium">Ghi chú</th>
             <th className="p-1 font-medium"></th>
@@ -180,10 +225,11 @@ export default function TransactionTable({
         </tbody>
         <tfoot>
           <tr className="font-bold border-t border-black/10 dark:border-white/10">
-            <td className="p-1.5 text-right whitespace-nowrap">{formatVnd(total)}</td>
-            <td className="p-1.5 whitespace-nowrap" colSpan={7}>
+            <td className="p-1.5 whitespace-nowrap" colSpan={3}>
               Tổng ({transactions.length} khoản chi)
             </td>
+            <td className="p-1.5 text-right whitespace-nowrap">{formatVnd(total)}</td>
+            <td className="p-1.5" colSpan={4}></td>
           </tr>
         </tfoot>
       </table>

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import TransactionForm from "@/components/TransactionForm";
 import TransactionTable from "@/components/TransactionTable";
-import { CATEGORIES, monthKeyFromDate, formatMonthLabel } from "@/lib/constants";
+import { CATEGORIES, CATEGORY_ICON, monthKeyFromDate, formatMonthLabel } from "@/lib/constants";
 import type { Transaction } from "@/lib/types";
 
 export default function GiaoDichPage() {
@@ -26,10 +26,9 @@ export default function GiaoDichPage() {
   }, [month, load]);
 
   function handleAdded(t: Transaction) {
+    // Newly entered expenses always land at the very top, regardless of date.
     if (t.recordMonth === month) {
-      setTransactions((prev) =>
-        [t, ...prev].sort((a, b) => (a.date < b.date ? 1 : -1)),
-      );
+      setTransactions((prev) => [t, ...prev]);
     }
   }
 
@@ -72,7 +71,7 @@ export default function GiaoDichPage() {
               <option value="">Tất cả</option>
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
-                  {c}
+                  {CATEGORY_ICON[c]} {c}
                 </option>
               ))}
             </select>

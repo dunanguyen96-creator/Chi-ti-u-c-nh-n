@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatVnd, formatDateDMY } from "@/lib/constants";
+import { buildCalendarEventUrl } from "@/lib/calendar";
 import type { CreditCard, Loan } from "@/lib/types";
 
 interface UpcomingItem {
@@ -133,7 +134,22 @@ export default function UpcomingPaymentsModal() {
                         : `Còn ${days} ngày · ${formatDateDMY(item.dueDate.toISOString())}`}
                   </span>
                 </div>
-                <span className="tabular-nums font-medium shrink-0">{formatVnd(item.amount)}</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <a
+                    href={buildCalendarEventUrl({
+                      title: `Thanh toán ${item.label}`,
+                      date: item.dueDate,
+                      description: `Cần thanh toán ${formatVnd(item.amount)}`,
+                    })}
+                    download={`nhac-thanh-toan-${item.key}.ics`}
+                    onClick={(e) => e.stopPropagation()}
+                    title="Thêm vào lịch điện thoại"
+                    className="text-xs text-[var(--accent)] hover:underline whitespace-nowrap"
+                  >
+                    📅 Thêm vào lịch
+                  </a>
+                  <span className="tabular-nums font-medium">{formatVnd(item.amount)}</span>
+                </div>
               </li>
             );
           })}
